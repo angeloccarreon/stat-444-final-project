@@ -46,7 +46,181 @@ output:
   rticles::ims_article:
     journal: aoas # aap, aoas, aop, aos, sts. See documentation
     toc: false # Please use for articles with 50 pages and more
+header-includes:
+- \usepackage{listings}
+- \usepackage{xcolor}
+- \usepackage{float}
+- \floatplacement{figure}{H}
+editor_options: 
+  markdown: 
+    wrap: 80
 ---
+
+```{r setup, echo = FALSE}
+library(knitr)
+library(readr)
+library(kableExtra)
+library(data.table)
+
+opts_chunk$set(tidy.opts=list(width.cutoff=75))
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
+
+# setwd("C:/Users/Angelo/OneDrive - University of Waterloo/School/University/Year 4/4B/STAT 444/A2")
+```
+
+\newenvironment{kframe}{}{}
+
+# Exploratory Data Analysis
+```{r, echo=FALSE}
+# replace with file path to the dataset
+setwd("C:/Users/Angelo/OneDrive - University of Waterloo/School/University/Year 4/4B/STAT 444/Final Project")
+housing <- read_csv("house-prices-advanced-regression-techniques/train.csv")
+library(ggplot2)
+```
+## Summary Statistics
+* the dataset contains 2930 rows and 82 columns
+* 80 explanatory variables, 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variates.
+```{r}
+nrow(housing)
+ncol(housing)
+
+# remove column Order since it's just row index
+housing <- housing[ , !(names(housing) == "Order")]
+```
+
+
+
+## Missing/duplicate Values
+* some columns contain a large number of NAs 
+* 0 duplicates
+```{r}
+# Alley: Type of alley access to property
+sum(!is.na(housing$Alley))      # only 198 observations
+# Pool.QC: Pool quality
+sum(!is.na(housing$Pool.QC))    # only 13 observations
+# Misc.Feature: Miscellaneous feature not covered in other categories
+sum(!is.na(housing$Misc.Feature)) # only 106 observations
+# Fence: Fence quality
+sum(!is.na(housing$Fence))  # only 572 observations
+# Fireplace.Qu: Fireplace quality
+sum(!is.na(housing$Fireplace.Qu)) # only 1508 observations
+
+# remove column alley, pool QC, Misc Feature
+drops <- c("Alley","Pool.QC", "Fence", "Misc.Feature")
+newHousing <- housing[ , !(names(housing) %in% drops)]
+
+# Check for duplicates in the entire dataset (0 duplicates)
+duplicates <- housing[duplicated(housing), ]
+dim(duplicates)
+```
+
+
+
+## Distribution of dependent variable
+* the distribution of Sale Price looks very right-skewed:
+most values are clustered around the left tail while the right tail is longer (extreme high values)
+* The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69. 
+* Need to apply natural log transformation to address the non-normal distribution
+```{r}
+summary(housing$SalePrice)
+
+options(scipen=10)
+hist(housing$SalePrice, xlab = "Property Sale Price", main = "Histogram of Sale Price")
+lines(housing$SalePrice, col = 4, lwd = 2)
+par(new=TRUE)   
+plot(density(housing$SalePrice), col=2, lwd = 2, yaxt="n", xaxt="n",
+     bty='n', xlab="", ylab="", main='')
+axis(4, las=1)
+
+hist(log(housing$SalePrice), xlab = "log(Sale Price)", main = "Histogram of log(Sale Price)", breaks = 20)
+par(new=TRUE)   
+plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
+     bty='n', xlab="", ylab="", main='')
+axis(4, las=1)
+```
+
+
+
+## Correlations with the dependent variable
+* Top 5 variables with the highest correlations:
+  + Overall.Qual: Rates the overall material and finish of the house
+  + Gr.Liv.Area: Above grade (ground) living area square feet
+  + Garage.Cars:  Size of garage in car capacity
+  + Garage.Area:  Size of garage in square feet
+  + Total.Bsmt.SF: Total square feet of basement area
+```{r}
+# Subset of numeric columns
+numericHousingData <- newHousing[, sapply(newHousing, is.numeric)]
+
+# Calculate the correlations between each numeric column and the response variable
+correlations <- cor(numericHousingData[, -which(names(numericHousingData) == "SalePrice")], 
+                    numericHousingData$SalePrice, use = "complete.obs")
+
+# rank the correlations into two groups (positive and negative)
+posCorrelations <- correlations[correlations[,1] >= 0, ]
+negCorrelations <- correlations[correlations[,1] < 0, ]
+
+# Print the correlations
+print(sort(posCorrelations,decreasing=TRUE))
+print(sort(negCorrelations,decreasing=FALSE))
+```
+
+
+
+
+## Check if there is a high degree of correlation or linear association among independent variables
+```{r}
+cor_matrix <- cor(numericHousingData, use = "complete.obs")
+
+corr_df = data.frame(cor_matrix)
+corr_df$var = row.names(corr_df)
+
+# Positive
+corr_df1 = reshape2::melt(corr_df, value_name = "Corr")
+corr_df1 = corr_df1[(corr_df1$value > 0.7 & corr_df1$value < 1),]
+print(corr_df1[order(corr_df1$value,decreasing=TRUE),])
+maxpos <- corr_df1[order(corr_df1$value),]
+
+# Negative
+corr_df2 = reshape2::melt(corr_df, value_name = "Corr")
+corr_df2 = corr_df2[(corr_df2$value < -0.7 & corr_df2$value > -1),]
+print(corr_df2[order(corr_df2$value,decreasing=TRUE),])
+maxneg <- corr_df2[order(corr_df2$value),]
+
+# Correlation matrix including only the top positive and negative correlations
+names <- c(maxpos$var, maxneg$var)
+topcormat <- cor_matrix[names, names]
+
+# plot the correlation matrix
+# install.packages('corrplot')
+library(corrplot)
+corrplot(topcormat, method='color', tl.cex=0.5)
+```
+
+
+
+## Other interesting but non-numeric variables 
+* Neighborhood
+* Street: Type of road access to property
+   + no predictive power; most likely irrelevant to house prices
+   + can be dropped
+* Utilities: Type of utilities available
+   + There is not much variability in the distribution of data. All observations but 3 have “AllPub” as their values for Utilities
+   + can be dropped
+* Roof.Matl: Roof material
+   + The most common data item "CompShg" occurs 2887 times out of 2930 observations 
+   + can be dropped
+```{r}
+ggplot(housing, aes(x=Neighborhood,y=SalePrice)) + geom_boxplot(color="black", fill="yellow")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+as.data.frame(table(housing$Street))
+as.data.frame(table(housing$Utilities))
+as.data.frame(table(housing$Roof.Matl))
+```
 
 \newpage
 

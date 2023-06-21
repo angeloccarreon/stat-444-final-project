@@ -38,6 +38,47 @@
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
 
+% Pandoc syntax highlighting
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 
 % tightlist command for lists without linebreak
 \providecommand{\tightlist}{%
@@ -104,6 +145,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \endlocaldefs
 
+% pandoc header
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\floatplacement{figure}{H}
+% pandoc header
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 
 \begin{document}
 
@@ -115,9 +176,9 @@
 %% Enter the title of your article here     %%
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{STAT 444 PROJECT PROPOSAL}
+\title{STAT 444 FINAL PROJECT PROPOSAL}
 %\title{A sample article title with some additional note\thanksref{T1}}
-\runtitle{A sample running head title}
+\runtitle{}
 %\thankstext{T1}{A sample of additional note to the title.}
 
 
@@ -137,14 +198,17 @@
 %%\and
 %%\author[B]{\fnms{Third} \snm{Author}\ead[label=e3,mark]{third@somewhere.com}}
 
-\author[A]{\fnms{First} \snm{Author}
-  \ead[label=e1]{first@somewhere.com}}
+\author[A]{\fnms{Angelo} \snm{Carreon}
+  \ead[label=e1]{jaccarre@uwaterloo.ca}}
   ,
-\author[B]{\fnms{Second} \snm{Author}
-  \ead[label=e2,mark]{second@somewhere.com}}
+\author[A]{\fnms{Hoseok} \snm{Lee}
+  \ead[label=e2,mark]{h349lee@uwaterloo.ca}}
+  
+\author[A]{\fnms{Joy} \snm{Chen}
+  \ead[label=e2,mark]{z635chen@uwaterloo.ca}}
   \textbackslash and
-\author[B]{\fnms{Third} \snm{Author}
-  \ead[label=e3,mark]{third@somewhere.com}}
+\author[A]{\fnms{Third} \snm{Author}
+  \ead[label=e3,mark]{s58shen@uwaterloo.ca}}
   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,32 +218,484 @@
 %%\address[B]{Department,
 %%University or Company Name,
 %%\printead{e2,e3}}
-\address[A]{Department, University or Company Name,
+\address[A]{Department of Statistics and Actuarial Science, University
+of Waterloo,
   \printead{e1}}
-\address[B]{Department, University or Company Name,
-  \printead{e2,e3}}
 \end{aug}
 
 \begin{abstract}
-The abstract should summarize the contents of the paper. It should be
-clear, descriptive, self-explanatory and not longer than 200 words. It
-should also be suitable for publication in abstracting services.
-Formulas should be used as sparingly as possible within the abstract.
-The abstract should not make reference to results, bibliography or
-formulas in the body of the paper---it should be self-contained.
-
-This is a sample input file. Comparing it with the output it generates
-can show you how to produce a simple document of your own.
+This paper contains
 \end{abstract}
 
 
 \begin{keyword}
-\kwd{First keyword}
-\kwd{Second keyword}
+\kwd{We love regression}
 \end{keyword}
 
 \end{frontmatter}
 
+
+\newenvironment{kframe}{}{}
+
+\hypertarget{exploratory-data-analysis}{%
+\section{Exploratory Data Analysis}\label{exploratory-data-analysis}}
+
+\begin{verbatim}
+## Rows: 1460 Columns: 81
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr (43): MSZoning, Street, Alley, LotShape, LandContour, Utilities, LotConf...
+## dbl (38): Id, MSSubClass, LotFrontage, LotArea, OverallQual, OverallCond, Ye...
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\hypertarget{summary-statistics}{%
+\subsection{Summary Statistics}\label{summary-statistics}}
+
+\begin{itemize}
+\tightlist
+\item
+  the dataset contains 2930 rows and 82 columns
+\item
+  80 explanatory variables, 23 nominal, 23 ordinal, 14 discrete, and 20
+  continuous variates.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nrow}\NormalTok{(housing)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1460
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ncol}\NormalTok{(housing)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 81
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# remove column Order since it\textquotesingle{}s just row index}
+\NormalTok{housing }\OtherTok{\textless{}{-}}\NormalTok{ housing[ , }\SpecialCharTok{!}\NormalTok{(}\FunctionTok{names}\NormalTok{(housing) }\SpecialCharTok{==} \StringTok{"Order"}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{missingduplicate-values}{%
+\subsection{Missing/duplicate Values}\label{missingduplicate-values}}
+
+\begin{itemize}
+\tightlist
+\item
+  some columns contain a large number of NAs
+\item
+  0 duplicates
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Alley: Type of alley access to property}
+\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Alley))      }\CommentTok{\# only 198 observations}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 91
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pool.QC: Pool quality}
+\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Pool.QC))    }\CommentTok{\# only 13 observations}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `Pool.QC`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Misc.Feature: Miscellaneous feature not covered in other categories}
+\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Misc.Feature)) }\CommentTok{\# only 106 observations}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `Misc.Feature`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Fence: Fence quality}
+\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Fence))  }\CommentTok{\# only 572 observations}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 281
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Fireplace.Qu: Fireplace quality}
+\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Fireplace.Qu)) }\CommentTok{\# only 1508 observations}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `Fireplace.Qu`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# remove column alley, pool QC, Misc Feature}
+\NormalTok{drops }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Alley"}\NormalTok{,}\StringTok{"Pool.QC"}\NormalTok{, }\StringTok{"Fence"}\NormalTok{, }\StringTok{"Misc.Feature"}\NormalTok{)}
+\NormalTok{newHousing }\OtherTok{\textless{}{-}}\NormalTok{ housing[ , }\SpecialCharTok{!}\NormalTok{(}\FunctionTok{names}\NormalTok{(housing) }\SpecialCharTok{\%in\%}\NormalTok{ drops)]}
+
+\CommentTok{\# Check for duplicates in the entire dataset (0 duplicates)}
+\NormalTok{duplicates }\OtherTok{\textless{}{-}}\NormalTok{ housing[}\FunctionTok{duplicated}\NormalTok{(housing), ]}
+\FunctionTok{dim}\NormalTok{(duplicates)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1]  0 81
+\end{verbatim}
+
+\hypertarget{distribution-of-dependent-variable}{%
+\subsection{Distribution of dependent
+variable}\label{distribution-of-dependent-variable}}
+
+\begin{itemize}
+\tightlist
+\item
+  the distribution of Sale Price looks very right-skewed: most values
+  are clustered around the left tail while the right tail is longer
+  (extreme high values)
+\item
+  The sale prices range from \$12,789 to \$755,000 with a mean of
+  \$180,796 and a standard deviation of \$79,886.69.
+\item
+  Need to apply natural log transformation to address the non-normal
+  distribution
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   34900  129975  163000  180921  214000  755000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{options}\NormalTok{(}\AttributeTok{scipen=}\DecValTok{10}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice, }\AttributeTok{xlab =} \StringTok{"Property Sale Price"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Histogram of Sale Price"}\NormalTok{)}
+\FunctionTok{lines}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice, }\AttributeTok{col =} \DecValTok{4}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{new=}\ConstantTok{TRUE}\NormalTok{)   }
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{density}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice), }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{yaxt=}\StringTok{"n"}\NormalTok{, }\AttributeTok{xaxt=}\StringTok{"n"}\NormalTok{,}
+     \AttributeTok{bty=}\StringTok{\textquotesingle{}n\textquotesingle{}}\NormalTok{, }\AttributeTok{xlab=}\StringTok{""}\NormalTok{, }\AttributeTok{ylab=}\StringTok{""}\NormalTok{, }\AttributeTok{main=}\StringTok{\textquotesingle{}\textquotesingle{}}\NormalTok{)}
+\FunctionTok{axis}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{las=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{log}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice), }\AttributeTok{xlab =} \StringTok{"log(Sale Price)"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Histogram of log(Sale Price)"}\NormalTok{, }\AttributeTok{breaks =} \DecValTok{20}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{new=}\ConstantTok{TRUE}\NormalTok{)   }
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{density}\NormalTok{(}\FunctionTok{log}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice)), }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{yaxt=}\StringTok{"n"}\NormalTok{, }\AttributeTok{xaxt=}\StringTok{"n"}\NormalTok{,}
+     \AttributeTok{bty=}\StringTok{\textquotesingle{}n\textquotesingle{}}\NormalTok{, }\AttributeTok{xlab=}\StringTok{""}\NormalTok{, }\AttributeTok{ylab=}\StringTok{""}\NormalTok{, }\AttributeTok{main=}\StringTok{\textquotesingle{}\textquotesingle{}}\NormalTok{)}
+\FunctionTok{axis}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{las=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-4-2.pdf}
+
+\hypertarget{correlations-with-the-dependent-variable}{%
+\subsection{Correlations with the dependent
+variable}\label{correlations-with-the-dependent-variable}}
+
+\begin{itemize}
+\tightlist
+\item
+  Top 5 variables with the highest correlations:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Overall.Qual: Rates the overall material and finish of the house
+  \item
+    Gr.Liv.Area: Above grade (ground) living area square feet
+  \item
+    Garage.Cars: Size of garage in car capacity
+  \item
+    Garage.Area: Size of garage in square feet
+  \item
+    Total.Bsmt.SF: Total square feet of basement area
+  \end{itemize}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Subset of numeric columns}
+\NormalTok{numericHousingData }\OtherTok{\textless{}{-}}\NormalTok{ newHousing[, }\FunctionTok{sapply}\NormalTok{(newHousing, is.numeric)]}
+
+\CommentTok{\# Calculate the correlations between each numeric column and the response variable}
+\NormalTok{correlations }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(numericHousingData[, }\SpecialCharTok{{-}}\FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(numericHousingData) }\SpecialCharTok{==} \StringTok{"SalePrice"}\NormalTok{)], }
+\NormalTok{                    numericHousingData}\SpecialCharTok{$}\NormalTok{SalePrice, }\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{)}
+
+\CommentTok{\# rank the correlations into two groups (positive and negative)}
+\NormalTok{posCorrelations }\OtherTok{\textless{}{-}}\NormalTok{ correlations[correlations[,}\DecValTok{1}\NormalTok{] }\SpecialCharTok{\textgreater{}=} \DecValTok{0}\NormalTok{, ]}
+\NormalTok{negCorrelations }\OtherTok{\textless{}{-}}\NormalTok{ correlations[correlations[,}\DecValTok{1}\NormalTok{] }\SpecialCharTok{\textless{}} \DecValTok{0}\NormalTok{, ]}
+
+\CommentTok{\# Print the correlations}
+\FunctionTok{print}\NormalTok{(}\FunctionTok{sort}\NormalTok{(posCorrelations,}\AttributeTok{decreasing=}\ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  OverallQual    GrLivArea   GarageCars   GarageArea  TotalBsmtSF     1stFlrSF 
+##   0.79788068   0.70515357   0.64703361   0.61932962   0.61561224   0.60796911 
+##     FullBath TotRmsAbvGrd    YearBuilt YearRemodAdd  GarageYrBlt   MasVnrArea 
+##   0.56662744   0.54706736   0.52539360   0.52125327   0.50475302   0.48865815 
+##   Fireplaces   BsmtFinSF1  LotFrontage  OpenPorchSF   WoodDeckSF     2ndFlrSF 
+##   0.46187269   0.39030052   0.34426977   0.34335381   0.33685512   0.30687900 
+##      LotArea     HalfBath BsmtFullBath    BsmtUnfSF BedroomAbvGr  ScreenPorch 
+##   0.29996221   0.26856030   0.23673741   0.21312868   0.16681389   0.11042681 
+##     PoolArea       MoSold    3SsnPorch 
+##   0.09248812   0.05156806   0.03077659
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{sort}\NormalTok{(negCorrelations,}\AttributeTok{decreasing=}\ConstantTok{FALSE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## EnclosedPorch  KitchenAbvGr   OverallCond    MSSubClass            Id 
+##  -0.154843204  -0.140497445  -0.124391232  -0.088031702  -0.047121850 
+##  BsmtHalfBath       MiscVal    BsmtFinSF2        YrSold  LowQualFinSF 
+##  -0.036512665  -0.036041237  -0.028021366  -0.011868823  -0.001481983
+\end{verbatim}
+
+\hypertarget{check-if-there-is-a-high-degree-of-correlation-or-linear-association-among-independent-variables}{%
+\subsection{Check if there is a high degree of correlation or linear
+association among independent
+variables}\label{check-if-there-is-a-high-degree-of-correlation-or-linear-association-among-independent-variables}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cor\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(numericHousingData, }\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{)}
+
+\NormalTok{corr\_df }\OtherTok{=} \FunctionTok{data.frame}\NormalTok{(cor\_matrix)}
+\NormalTok{corr\_df}\SpecialCharTok{$}\NormalTok{var }\OtherTok{=} \FunctionTok{row.names}\NormalTok{(corr\_df)}
+
+\CommentTok{\# Positive}
+\NormalTok{corr\_df1 }\OtherTok{=}\NormalTok{ reshape2}\SpecialCharTok{::}\FunctionTok{melt}\NormalTok{(corr\_df, }\AttributeTok{value\_name =} \StringTok{"Corr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Using var as id variables
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{corr\_df1 }\OtherTok{=}\NormalTok{ corr\_df1[(corr\_df1}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textgreater{}} \FloatTok{0.7} \SpecialCharTok{\&}\NormalTok{ corr\_df1}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textless{}} \DecValTok{1}\NormalTok{),]}
+\FunctionTok{print}\NormalTok{(corr\_df1[}\FunctionTok{order}\NormalTok{(corr\_df1}\SpecialCharTok{$}\NormalTok{value,}\AttributeTok{decreasing=}\ConstantTok{TRUE}\NormalTok{),])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##               var     variable     value
+## 1016   GarageArea   GarageCars 0.8394149
+## 1053   GarageCars   GarageArea 0.8394149
+## 470      1stFlrSF  TotalBsmtSF 0.8359994
+## 507   TotalBsmtSF    X1stFlrSF 0.8359994
+## 632  TotRmsAbvGrd    GrLivArea 0.8243121
+## 891     GrLivArea TotRmsAbvGrd 0.8243121
+## 254   GarageYrBlt    YearBuilt 0.8235195
+## 957     YearBuilt  GarageYrBlt 0.8235195
+## 190     SalePrice  OverallQual 0.7978807
+## 1411  OverallQual    SalePrice 0.7978807
+## 646     SalePrice    GrLivArea 0.7051536
+## 1423    GrLivArea    SalePrice 0.7051536
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{maxpos }\OtherTok{\textless{}{-}}\NormalTok{ corr\_df1[}\FunctionTok{order}\NormalTok{(corr\_df1}\SpecialCharTok{$}\NormalTok{value),]}
+
+\CommentTok{\# Negative}
+\NormalTok{corr\_df2 }\OtherTok{=}\NormalTok{ reshape2}\SpecialCharTok{::}\FunctionTok{melt}\NormalTok{(corr\_df, }\AttributeTok{value\_name =} \StringTok{"Corr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Using var as id variables
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{corr\_df2 }\OtherTok{=}\NormalTok{ corr\_df2[(corr\_df2}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textless{}} \SpecialCharTok{{-}}\FloatTok{0.7} \SpecialCharTok{\&}\NormalTok{ corr\_df2}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textgreater{}} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{),]}
+\FunctionTok{print}\NormalTok{(corr\_df2[}\FunctionTok{order}\NormalTok{(corr\_df2}\SpecialCharTok{$}\NormalTok{value,}\AttributeTok{decreasing=}\ConstantTok{TRUE}\NormalTok{),])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] var      variable value   
+## <0 rows> (or 0-length row.names)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{maxneg }\OtherTok{\textless{}{-}}\NormalTok{ corr\_df2[}\FunctionTok{order}\NormalTok{(corr\_df2}\SpecialCharTok{$}\NormalTok{value),]}
+
+\CommentTok{\# Correlation matrix including only the top positive and negative correlations}
+\NormalTok{names }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(maxpos}\SpecialCharTok{$}\NormalTok{var, maxneg}\SpecialCharTok{$}\NormalTok{var)}
+\NormalTok{topcormat }\OtherTok{\textless{}{-}}\NormalTok{ cor\_matrix[names, names]}
+
+\CommentTok{\# plot the correlation matrix}
+\CommentTok{\# install.packages(\textquotesingle{}corrplot\textquotesingle{})}
+\FunctionTok{library}\NormalTok{(corrplot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'corrplot' was built under R version 4.3.1
+\end{verbatim}
+
+\begin{verbatim}
+## corrplot 0.92 loaded
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{corrplot}\NormalTok{(topcormat, }\AttributeTok{method=}\StringTok{\textquotesingle{}color\textquotesingle{}}\NormalTok{, }\AttributeTok{tl.cex=}\FloatTok{0.5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\hypertarget{other-interesting-but-non-numeric-variables}{%
+\subsection{Other interesting but non-numeric
+variables}\label{other-interesting-but-non-numeric-variables}}
+
+\begin{itemize}
+\tightlist
+\item
+  Neighborhood
+\item
+  Street: Type of road access to property
+
+  \begin{itemize}
+  \tightlist
+  \item
+    no predictive power; most likely irrelevant to house prices
+  \item
+    can be dropped
+  \end{itemize}
+\item
+  Utilities: Type of utilities available
+
+  \begin{itemize}
+  \tightlist
+  \item
+    There is not much variability in the distribution of data. All
+    observations but 3 have ``AllPub'' as their values for Utilities
+  \item
+    can be dropped
+  \end{itemize}
+\item
+  Roof.Matl: Roof material
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The most common data item ``CompShg'' occurs 2887 times out of 2930
+    observations
+  \item
+    can be dropped
+  \end{itemize}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(housing, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Neighborhood,}\AttributeTok{y=}\NormalTok{SalePrice)) }\SpecialCharTok{+} \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{color=}\StringTok{"black"}\NormalTok{, }\AttributeTok{fill=}\StringTok{"yellow"}\NormalTok{)}\SpecialCharTok{+}\FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{vjust =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{hjust=}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Street))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Var1 Freq
+## 1 Grvl    6
+## 2 Pave 1454
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Utilities))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Var1 Freq
+## 1 AllPub 1459
+## 2 NoSeWa    1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Roof.Matl))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `Roof.Matl`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] Freq
+## <0 rows> (or 0-length row.names)
+\end{verbatim}
+
+\newpage
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
@@ -507,7 +1023,7 @@ Std. dev.&
 
 \begin{figure}
 \centering
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-1-1.pdf}
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-8-1.pdf}
 \caption{Figure caption\label{penG}}
 \end{figure}
 
