@@ -5,31 +5,31 @@ author:
   - name: Angelo 
     surname: Carreon
     email: jaccarre@uwaterloo.ca
-    label: e1
+    label: e1, mark
     addressLabel: A
     sepNext: "," # use "," or \and; the last author not need this field
   - name: Hoseok
     surname: Lee
     email: h349lee@uwaterloo.ca
-    label: e2,mark
+    label: e2, mark
     addressLabel: A
   - name: Joy
     surname: Chen
     email: z635chen@uwaterloo.ca
-    label: e2,mark
+    label: e3, mark
     addressLabel: A
-    sepNext: \and
-  - name: Third
-    surname: Author
+    sepNext: "and"
+  - name: Steven
+    surname: Shen
     email: s58shen@uwaterloo.ca
-    label: e3,mark
+    label: e4, mark
     addressLabel: A
 affiliation:
   - label: A
     name: Department of Statistics and Actuarial Science, University of Waterloo
-    authorsLabels: e1
+    authorsLabels: e1,e2,e3,e4
 abstract: |
-  This paper contains 
+  This paper contains our proposal for the STAT 444 final project. It outlines our dataset, 
 keyword-subclass: | 
  \begin{keyword}[class=MSC2020] % It must be define for aap, aop, aos journals. For aoas, sts is not used
  \kwd[Primary ]{00X00}
@@ -61,6 +61,7 @@ library(knitr)
 library(readr)
 library(kableExtra)
 library(data.table)
+library(ggplot2)
 
 opts_chunk$set(tidy.opts=list(width.cutoff=75))
 def.chunk.hook  <- knitr::knit_hooks$get("chunk")
@@ -68,23 +69,23 @@ knitr::knit_hooks$set(chunk = function(x, options) {
   x <- def.chunk.hook(x, options)
   ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
 })
-
-# setwd("C:/Users/Angelo/OneDrive - University of Waterloo/School/University/Year 4/4B/STAT 444/A2")
 ```
 
 \newenvironment{kframe}{}{}
 
+# Introduction to our chosen dataset
+
+Our proposal primarily aims to assess the feasibility of utilizing regression techniques for interpolating and modeling housing prices. To achieve this objective, we have selected a dataset from the Journal of Statistics, which includes housing prices in Ames, Iowa, along with other pertinent features. In today's dynamic real estate market, precise and dependable house price predictions hold immense significance for homeowners, buyers, and real estate professionals alike. By delving into the potential of these advanced modeling techniques, our goal is to augment the accuracy and reliability of house price predictions, contributing to more informed decision-making in the industry.
+
 # Exploratory Data Analysis
-```{r, echo=FALSE}
-# replace with file path to the dataset
-setwd("C:/Users/Angelo/OneDrive - University of Waterloo/School/University/Year 4/4B/STAT 444/Final Project")
+```{r, echo=FALSE, results=FALSE, message=FALSE}
 housing <- read_csv("house-prices-advanced-regression-techniques/train.csv")
-library(ggplot2)
 ```
+
 ## Summary Statistics
 * the dataset contains 2930 rows and 82 columns
 * 80 explanatory variables, 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variates.
-```{r}
+```{r, echo=FALSE}
 nrow(housing)
 ncol(housing)
 
@@ -97,7 +98,7 @@ housing <- housing[ , !(names(housing) == "Order")]
 ## Missing/duplicate Values
 * some columns contain a large number of NAs 
 * 0 duplicates
-```{r}
+```{r, echo=FALSE}
 # Alley: Type of alley access to property
 sum(!is.na(housing$Alley))      # only 198 observations
 # Pool.QC: Pool quality
@@ -125,7 +126,7 @@ dim(duplicates)
 most values are clustered around the left tail while the right tail is longer (extreme high values)
 * The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69. 
 * Need to apply natural log transformation to address the non-normal distribution
-```{r}
+```{r, echo=FALSE}
 summary(housing$SalePrice)
 
 options(scipen=10)
@@ -152,7 +153,7 @@ axis(4, las=1)
   + Garage.Cars:  Size of garage in car capacity
   + Garage.Area:  Size of garage in square feet
   + Total.Bsmt.SF: Total square feet of basement area
-```{r}
+```{r, echo=FALSE}
 # Subset of numeric columns
 numericHousingData <- newHousing[, sapply(newHousing, is.numeric)]
 
@@ -173,7 +174,7 @@ print(sort(negCorrelations,decreasing=FALSE))
 
 
 ## Check if there is a high degree of correlation or linear association among independent variables
-```{r}
+```{r, echo=FALSE}
 cor_matrix <- cor(numericHousingData, use = "complete.obs")
 
 corr_df = data.frame(cor_matrix)
@@ -214,7 +215,7 @@ corrplot(topcormat, method='color', tl.cex=0.5)
 * Roof.Matl: Roof material
    + The most common data item "CompShg" occurs 2887 times out of 2930 observations 
    + can be dropped
-```{r}
+```{r, echo=FALSE}
 ggplot(housing, aes(x=Neighborhood,y=SalePrice)) + geom_boxplot(color="black", fill="yellow")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 as.data.frame(table(housing$Street))

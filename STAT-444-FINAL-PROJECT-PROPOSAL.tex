@@ -38,47 +38,6 @@
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
 
-% Pandoc syntax highlighting
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 
 % tightlist command for lists without linebreak
 \providecommand{\tightlist}{%
@@ -199,16 +158,16 @@
 %%\author[B]{\fnms{Third} \snm{Author}\ead[label=e3,mark]{third@somewhere.com}}
 
 \author[A]{\fnms{Angelo} \snm{Carreon}
-  \ead[label=e1]{jaccarre@uwaterloo.ca}}
+  \ead[label=e1, mark]{jaccarre@uwaterloo.ca}}
   ,
 \author[A]{\fnms{Hoseok} \snm{Lee}
-  \ead[label=e2,mark]{h349lee@uwaterloo.ca}}
+  \ead[label=e2, mark]{h349lee@uwaterloo.ca}}
   
 \author[A]{\fnms{Joy} \snm{Chen}
-  \ead[label=e2,mark]{z635chen@uwaterloo.ca}}
-  \textbackslash and
-\author[A]{\fnms{Third} \snm{Author}
-  \ead[label=e3,mark]{s58shen@uwaterloo.ca}}
+  \ead[label=e3, mark]{z635chen@uwaterloo.ca}}
+  and
+\author[A]{\fnms{Steven} \snm{Shen}
+  \ead[label=e4, mark]{s58shen@uwaterloo.ca}}
   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -220,11 +179,12 @@
 %%\printead{e2,e3}}
 \address[A]{Department of Statistics and Actuarial Science, University
 of Waterloo,
-  \printead{e1}}
+  \printead{e1,e2,e3,e4}}
 \end{aug}
 
 \begin{abstract}
-This paper contains
+This paper contains our proposal for the STAT 444 final project. It
+outlines our dataset,
 \end{abstract}
 
 
@@ -237,19 +197,23 @@ This paper contains
 
 \newenvironment{kframe}{}{}
 
+\hypertarget{introduction-to-our-chosen-dataset}{%
+\section{Introduction to our chosen
+dataset}\label{introduction-to-our-chosen-dataset}}
+
+Our proposal primarily aims to assess the feasibility of utilizing
+regression techniques for interpolating and modeling housing prices. To
+achieve this objective, we have selected a dataset from the Journal of
+Statistics, which includes housing prices in Ames, Iowa, along with
+other pertinent features. In today's dynamic real estate market, precise
+and dependable house price predictions hold immense significance for
+homeowners, buyers, and real estate professionals alike. By delving into
+the potential of these advanced modeling techniques, our goal is to
+augment the accuracy and reliability of house price predictions,
+contributing to more informed decision-making in the industry.
+
 \hypertarget{exploratory-data-analysis}{%
 \section{Exploratory Data Analysis}\label{exploratory-data-analysis}}
-
-\begin{verbatim}
-## Rows: 1460 Columns: 81
-## -- Column specification --------------------------------------------------------
-## Delimiter: ","
-## chr (43): MSZoning, Street, Alley, LotShape, LandContour, Utilities, LotConf...
-## dbl (38): Id, MSSubClass, LotFrontage, LotArea, OverallQual, OverallCond, Ye...
-## 
-## i Use `spec()` to retrieve the full column specification for this data.
-## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
-\end{verbatim}
 
 \hypertarget{summary-statistics}{%
 \subsection{Summary Statistics}\label{summary-statistics}}
@@ -263,32 +227,13 @@ This paper contains
   continuous variates.
 \end{itemize}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{nrow}\NormalTok{(housing)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## [1] 1460
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{ncol}\NormalTok{(housing)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## [1] 81
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# remove column Order since it\textquotesingle{}s just row index}
-\NormalTok{housing }\OtherTok{\textless{}{-}}\NormalTok{ housing[ , }\SpecialCharTok{!}\NormalTok{(}\FunctionTok{names}\NormalTok{(housing) }\SpecialCharTok{==} \StringTok{"Order"}\NormalTok{)]}
-\end{Highlighting}
-\end{Shaded}
 
 \hypertarget{missingduplicate-values}{%
 \subsection{Missing/duplicate Values}\label{missingduplicate-values}}
@@ -301,23 +246,9 @@ This paper contains
   0 duplicates
 \end{itemize}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Alley: Type of alley access to property}
-\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Alley))      }\CommentTok{\# only 198 observations}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## [1] 91
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Pool.QC: Pool quality}
-\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Pool.QC))    }\CommentTok{\# only 13 observations}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## Warning: Unknown or uninitialised column: `Pool.QC`.
@@ -327,13 +258,6 @@ This paper contains
 ## [1] 0
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Misc.Feature: Miscellaneous feature not covered in other categories}
-\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Misc.Feature)) }\CommentTok{\# only 106 observations}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## Warning: Unknown or uninitialised column: `Misc.Feature`.
 \end{verbatim}
@@ -342,23 +266,9 @@ This paper contains
 ## [1] 0
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Fence: Fence quality}
-\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Fence))  }\CommentTok{\# only 572 observations}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## [1] 281
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Fireplace.Qu: Fireplace quality}
-\FunctionTok{sum}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Fireplace.Qu)) }\CommentTok{\# only 1508 observations}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## Warning: Unknown or uninitialised column: `Fireplace.Qu`.
@@ -367,18 +277,6 @@ This paper contains
 \begin{verbatim}
 ## [1] 0
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# remove column alley, pool QC, Misc Feature}
-\NormalTok{drops }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Alley"}\NormalTok{,}\StringTok{"Pool.QC"}\NormalTok{, }\StringTok{"Fence"}\NormalTok{, }\StringTok{"Misc.Feature"}\NormalTok{)}
-\NormalTok{newHousing }\OtherTok{\textless{}{-}}\NormalTok{ housing[ , }\SpecialCharTok{!}\NormalTok{(}\FunctionTok{names}\NormalTok{(housing) }\SpecialCharTok{\%in\%}\NormalTok{ drops)]}
-
-\CommentTok{\# Check for duplicates in the entire dataset (0 duplicates)}
-\NormalTok{duplicates }\OtherTok{\textless{}{-}}\NormalTok{ housing[}\FunctionTok{duplicated}\NormalTok{(housing), ]}
-\FunctionTok{dim}\NormalTok{(duplicates)}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## [1]  0 81
@@ -402,41 +300,12 @@ variable}\label{distribution-of-dependent-variable}}
   distribution
 \end{itemize}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   34900  129975  163000  180921  214000  755000
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{options}\NormalTok{(}\AttributeTok{scipen=}\DecValTok{10}\NormalTok{)}
-\FunctionTok{hist}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice, }\AttributeTok{xlab =} \StringTok{"Property Sale Price"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Histogram of Sale Price"}\NormalTok{)}
-\FunctionTok{lines}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice, }\AttributeTok{col =} \DecValTok{4}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
-\FunctionTok{par}\NormalTok{(}\AttributeTok{new=}\ConstantTok{TRUE}\NormalTok{)   }
-\FunctionTok{plot}\NormalTok{(}\FunctionTok{density}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice), }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{yaxt=}\StringTok{"n"}\NormalTok{, }\AttributeTok{xaxt=}\StringTok{"n"}\NormalTok{,}
-     \AttributeTok{bty=}\StringTok{\textquotesingle{}n\textquotesingle{}}\NormalTok{, }\AttributeTok{xlab=}\StringTok{""}\NormalTok{, }\AttributeTok{ylab=}\StringTok{""}\NormalTok{, }\AttributeTok{main=}\StringTok{\textquotesingle{}\textquotesingle{}}\NormalTok{)}
-\FunctionTok{axis}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{las=}\DecValTok{1}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
 \includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-4-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{hist}\NormalTok{(}\FunctionTok{log}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice), }\AttributeTok{xlab =} \StringTok{"log(Sale Price)"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Histogram of log(Sale Price)"}\NormalTok{, }\AttributeTok{breaks =} \DecValTok{20}\NormalTok{)}
-\FunctionTok{par}\NormalTok{(}\AttributeTok{new=}\ConstantTok{TRUE}\NormalTok{)   }
-\FunctionTok{plot}\NormalTok{(}\FunctionTok{density}\NormalTok{(}\FunctionTok{log}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{SalePrice)), }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{yaxt=}\StringTok{"n"}\NormalTok{, }\AttributeTok{xaxt=}\StringTok{"n"}\NormalTok{,}
-     \AttributeTok{bty=}\StringTok{\textquotesingle{}n\textquotesingle{}}\NormalTok{, }\AttributeTok{xlab=}\StringTok{""}\NormalTok{, }\AttributeTok{ylab=}\StringTok{""}\NormalTok{, }\AttributeTok{main=}\StringTok{\textquotesingle{}\textquotesingle{}}\NormalTok{)}
-\FunctionTok{axis}\NormalTok{(}\DecValTok{4}\NormalTok{, }\AttributeTok{las=}\DecValTok{1}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
 \includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-4-2.pdf}
 
 \hypertarget{correlations-with-the-dependent-variable}{%
@@ -463,24 +332,6 @@ variable}\label{correlations-with-the-dependent-variable}}
   \end{itemize}
 \end{itemize}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Subset of numeric columns}
-\NormalTok{numericHousingData }\OtherTok{\textless{}{-}}\NormalTok{ newHousing[, }\FunctionTok{sapply}\NormalTok{(newHousing, is.numeric)]}
-
-\CommentTok{\# Calculate the correlations between each numeric column and the response variable}
-\NormalTok{correlations }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(numericHousingData[, }\SpecialCharTok{{-}}\FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(numericHousingData) }\SpecialCharTok{==} \StringTok{"SalePrice"}\NormalTok{)], }
-\NormalTok{                    numericHousingData}\SpecialCharTok{$}\NormalTok{SalePrice, }\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{)}
-
-\CommentTok{\# rank the correlations into two groups (positive and negative)}
-\NormalTok{posCorrelations }\OtherTok{\textless{}{-}}\NormalTok{ correlations[correlations[,}\DecValTok{1}\NormalTok{] }\SpecialCharTok{\textgreater{}=} \DecValTok{0}\NormalTok{, ]}
-\NormalTok{negCorrelations }\OtherTok{\textless{}{-}}\NormalTok{ correlations[correlations[,}\DecValTok{1}\NormalTok{] }\SpecialCharTok{\textless{}} \DecValTok{0}\NormalTok{, ]}
-
-\CommentTok{\# Print the correlations}
-\FunctionTok{print}\NormalTok{(}\FunctionTok{sort}\NormalTok{(posCorrelations,}\AttributeTok{decreasing=}\ConstantTok{TRUE}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ##  OverallQual    GrLivArea   GarageCars   GarageArea  TotalBsmtSF     1stFlrSF 
 ##   0.79788068   0.70515357   0.64703361   0.61932962   0.61561224   0.60796911 
@@ -494,12 +345,6 @@ variable}\label{correlations-with-the-dependent-variable}}
 ##   0.09248812   0.05156806   0.03077659
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{print}\NormalTok{(}\FunctionTok{sort}\NormalTok{(negCorrelations,}\AttributeTok{decreasing=}\ConstantTok{FALSE}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## EnclosedPorch  KitchenAbvGr   OverallCond    MSSubClass            Id 
 ##  -0.154843204  -0.140497445  -0.124391232  -0.088031702  -0.047121850 
@@ -512,28 +357,9 @@ variable}\label{correlations-with-the-dependent-variable}}
 association among independent
 variables}\label{check-if-there-is-a-high-degree-of-correlation-or-linear-association-among-independent-variables}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{cor\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(numericHousingData, }\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{)}
-
-\NormalTok{corr\_df }\OtherTok{=} \FunctionTok{data.frame}\NormalTok{(cor\_matrix)}
-\NormalTok{corr\_df}\SpecialCharTok{$}\NormalTok{var }\OtherTok{=} \FunctionTok{row.names}\NormalTok{(corr\_df)}
-
-\CommentTok{\# Positive}
-\NormalTok{corr\_df1 }\OtherTok{=}\NormalTok{ reshape2}\SpecialCharTok{::}\FunctionTok{melt}\NormalTok{(corr\_df, }\AttributeTok{value\_name =} \StringTok{"Corr"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## Using var as id variables
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{corr\_df1 }\OtherTok{=}\NormalTok{ corr\_df1[(corr\_df1}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textgreater{}} \FloatTok{0.7} \SpecialCharTok{\&}\NormalTok{ corr\_df1}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textless{}} \DecValTok{1}\NormalTok{),]}
-\FunctionTok{print}\NormalTok{(corr\_df1[}\FunctionTok{order}\NormalTok{(corr\_df1}\SpecialCharTok{$}\NormalTok{value,}\AttributeTok{decreasing=}\ConstantTok{TRUE}\NormalTok{),])}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ##               var     variable     value
@@ -551,44 +377,14 @@ variables}\label{check-if-there-is-a-high-degree-of-correlation-or-linear-associ
 ## 1423    GrLivArea    SalePrice 0.7051536
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{maxpos }\OtherTok{\textless{}{-}}\NormalTok{ corr\_df1[}\FunctionTok{order}\NormalTok{(corr\_df1}\SpecialCharTok{$}\NormalTok{value),]}
-
-\CommentTok{\# Negative}
-\NormalTok{corr\_df2 }\OtherTok{=}\NormalTok{ reshape2}\SpecialCharTok{::}\FunctionTok{melt}\NormalTok{(corr\_df, }\AttributeTok{value\_name =} \StringTok{"Corr"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ## Using var as id variables
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{corr\_df2 }\OtherTok{=}\NormalTok{ corr\_df2[(corr\_df2}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textless{}} \SpecialCharTok{{-}}\FloatTok{0.7} \SpecialCharTok{\&}\NormalTok{ corr\_df2}\SpecialCharTok{$}\NormalTok{value }\SpecialCharTok{\textgreater{}} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{),]}
-\FunctionTok{print}\NormalTok{(corr\_df2[}\FunctionTok{order}\NormalTok{(corr\_df2}\SpecialCharTok{$}\NormalTok{value,}\AttributeTok{decreasing=}\ConstantTok{TRUE}\NormalTok{),])}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## [1] var      variable value   
 ## <0 rows> (or 0-length row.names)
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{maxneg }\OtherTok{\textless{}{-}}\NormalTok{ corr\_df2[}\FunctionTok{order}\NormalTok{(corr\_df2}\SpecialCharTok{$}\NormalTok{value),]}
-
-\CommentTok{\# Correlation matrix including only the top positive and negative correlations}
-\NormalTok{names }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(maxpos}\SpecialCharTok{$}\NormalTok{var, maxneg}\SpecialCharTok{$}\NormalTok{var)}
-\NormalTok{topcormat }\OtherTok{\textless{}{-}}\NormalTok{ cor\_matrix[names, names]}
-
-\CommentTok{\# plot the correlation matrix}
-\CommentTok{\# install.packages(\textquotesingle{}corrplot\textquotesingle{})}
-\FunctionTok{library}\NormalTok{(corrplot)}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## Warning: package 'corrplot' was built under R version 4.3.1
@@ -597,12 +393,6 @@ variables}\label{check-if-there-is-a-high-degree-of-correlation-or-linear-associ
 \begin{verbatim}
 ## corrplot 0.92 loaded
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{corrplot}\NormalTok{(topcormat, }\AttributeTok{method=}\StringTok{\textquotesingle{}color\textquotesingle{}}\NormalTok{, }\AttributeTok{tl.cex=}\FloatTok{0.5}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
 \includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-6-1.pdf}
 
@@ -645,22 +435,9 @@ variables}\label{other-interesting-but-non-numeric-variables}}
     observations
   \item
     can be dropped
+    \includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-7-1.pdf}
   \end{itemize}
 \end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{ggplot}\NormalTok{(housing, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Neighborhood,}\AttributeTok{y=}\NormalTok{SalePrice)) }\SpecialCharTok{+} \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{color=}\StringTok{"black"}\NormalTok{, }\AttributeTok{fill=}\StringTok{"yellow"}\NormalTok{)}\SpecialCharTok{+}\FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{vjust =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{hjust=}\DecValTok{1}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-7-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Street))}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ##   Var1 Freq
@@ -668,23 +445,11 @@ variables}\label{other-interesting-but-non-numeric-variables}}
 ## 2 Pave 1454
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Utilities))}
-\end{Highlighting}
-\end{Shaded}
-
 \begin{verbatim}
 ##     Var1 Freq
 ## 1 AllPub 1459
 ## 2 NoSeWa    1
 \end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(housing}\SpecialCharTok{$}\NormalTok{Roof.Matl))}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{verbatim}
 ## Warning: Unknown or uninitialised column: `Roof.Matl`.
