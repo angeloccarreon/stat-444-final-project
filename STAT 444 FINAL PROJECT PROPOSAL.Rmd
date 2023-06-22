@@ -29,7 +29,7 @@ affiliation:
     name: Department of Statistics and Actuarial Science, University of Waterloo
     authorsLabels: e1,e2,e3,e4
 abstract: |
-  This paper contains our proposal for the STAT 444 final project. It outlines our dataset, 
+  This paper contains our proposal for the STAT 444 final project. It outlines our dataset, performs some brief exploratory data analysis, then outlines our approach to fitting regression models to predict a final sale price of a house given its physical attributes.
 keyword-subclass: | 
  \begin{keyword}[class=MSC2020] % It must be define for aap, aop, aos journals. For aoas, sts is not used
  \kwd[Primary ]{00X00}
@@ -134,7 +134,8 @@ most values clustered around the left tail and a significantly longer right tail
 summary(housing$SalePrice)
 ```
 
-```{r, echo=FALSE, fig.cap="Histogram of Sale Price\\label{}"}
+```{r, echo=FALSE, fig.height=4, fig.width=8, fig.cap="Histograms of the response variable, Sale Price\\label{}"}
+par(mfrow=c(1,2), mai=c(1, 1, 1, 1))
 options(scipen=10)
 hist(housing$SalePrice, xlab = "Property Sale Price", main = "Histogram of Sale Price")
 lines(housing$SalePrice, col = 4, lwd = 2)
@@ -142,16 +143,13 @@ par(new=TRUE)
 plot(density(housing$SalePrice), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
-```
 
-```{r, echo=FALSE, fig.cap="Histogram of Log Sale Price\\label{}"}
 hist(log(housing$SalePrice), xlab = "log(Sale Price)", main = "Histogram of log(Sale Price)", breaks = 20)
 par(new=TRUE)   
 plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
 ```
-
 
 ## Correlations with the dependent variable
 * Based on our correlation analysis, the top 5 numeric variables with the highest correlations with our dependent variable are:
