@@ -56,7 +56,8 @@ editor_options:
     wrap: 80
 ---
 
-```{r setup, echo = FALSE}
+```{r setup, echo = FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 library(knitr)
 library(readr)
 library(kableExtra)
@@ -73,8 +74,8 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 
 \newenvironment{kframe}{}{}
 
-# Introduction to our chosen dataset
-
+# Introduction to our chosen dataset 
+\
 Our proposal primarily aims to assess the feasibility of utilizing regression techniques for interpolating and modeling housing prices. To achieve this objective, we have selected a dataset from the Journal of Statistics, which includes housing prices in Ames, Iowa, along with other pertinent features. In today's dynamic real estate market, precise and dependable house price predictions hold immense significance for homeowners, buyers, and real estate professionals alike. By delving into the potential of these advanced modeling techniques, our goal is to augment the accuracy and reliability of house price predictions, contributing to more informed decision-making in the industry.
 
 # Exploratory Data Analysis
@@ -82,10 +83,10 @@ Our proposal primarily aims to assess the feasibility of utilizing regression te
 housing <- read_csv("house-prices-advanced-regression-techniques/train.csv")
 ```
 
-## Summary Statistics
-* the dataset contains 2930 rows and 82 columns
-* 80 explanatory variables, 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variates.
-```{r, echo=FALSE}
+## Summary Statistics 
+* The dataset contains 2930 rows and 82 columns
+* There are 80 explanatory variables, including 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables.
+```{r, echo=FALSE, results=FALSE, message=FALSE}
 nrow(housing)
 ncol(housing)
 
@@ -94,11 +95,14 @@ housing <- housing[ , !(names(housing) == "Order")]
 ```
 
 
-
 ## Missing/duplicate Values
-* some columns contain a large number of NAs 
-* 0 duplicates
-```{r, echo=FALSE}
+* There are four columns where missing values are extensive and need to be dropped as they are not critical to our analysis.
+    + Pool.QC has only 13 observations
+    + Misc.Feature has only 106 observations
+    + Pool.QC has only 198 observations
+    + Fence has only 572 observations
+* There are no duplicates rows
+```{r, echo=FALSE, results=FALSE, message=FALSE}
 # Alley: Type of alley access to property
 sum(!is.na(housing$Alley))      # only 198 observations
 # Pool.QC: Pool quality
@@ -122,13 +126,15 @@ dim(duplicates)
 
 
 ## Distribution of dependent variable
-* the distribution of Sale Price looks very right-skewed:
-most values are clustered around the left tail while the right tail is longer (extreme high values)
-* The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69. 
-* Need to apply natural log transformation to address the non-normal distribution
-```{r, echo=FALSE}
+* The distribution of Sale Price looks very right-skewed with
+most values clustered around the left tail and a significantly longer right tail, signifying extreme high values
+* The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69
+* To achieve a more normal distribution, we will apply log transformation on the dependent variable
+```{r, echo=FALSE, results=FALSE, message=FALSE}
 summary(housing$SalePrice)
+```
 
+```{r, echo=FALSE, fig.cap="Histogram of Sale Price\\label{}"}
 options(scipen=10)
 hist(housing$SalePrice, xlab = "Property Sale Price", main = "Histogram of Sale Price")
 lines(housing$SalePrice, col = 4, lwd = 2)
@@ -136,7 +142,9 @@ par(new=TRUE)
 plot(density(housing$SalePrice), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
+```
 
+```{r, echo=FALSE, fig.cap="Histogram of Log Sale Price\\label{}"}
 hist(log(housing$SalePrice), xlab = "log(Sale Price)", main = "Histogram of log(Sale Price)", breaks = 20)
 par(new=TRUE)   
 plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
@@ -145,15 +153,14 @@ axis(4, las=1)
 ```
 
 
-
 ## Correlations with the dependent variable
-* Top 5 variables with the highest correlations:
+* Based on our correlation analysis, the top 5 numeric variables with the highest correlations with our dependent variable are:
   + Overall.Qual: Rates the overall material and finish of the house
   + Gr.Liv.Area: Above grade (ground) living area square feet
   + Garage.Cars:  Size of garage in car capacity
   + Garage.Area:  Size of garage in square feet
   + Total.Bsmt.SF: Total square feet of basement area
-```{r, echo=FALSE}
+```{r, echo=FALSE, results=FALSE, message=FALSE}
 # Subset of numeric columns
 numericHousingData <- newHousing[, sapply(newHousing, is.numeric)]
 
@@ -172,9 +179,11 @@ print(sort(negCorrelations,decreasing=FALSE))
 
 
 
-
 ## Check if there is a high degree of correlation or linear association among independent variables
-```{r, echo=FALSE}
+* Some independent variables exemplify a strong correlation, which are to be expected because they essentially provide similar informaion.
+  + For example, the high correlation between the variable **Garage Area** (size of garage in square feet) and **Garage Cars** (size of garage in car capacity) is not surprising.
+  + To address this issue of redundancy, we will select one of them and exclude the other from the analysis.
+```{r, echo=FALSE,results=FALSE, message=FALSE}
 cor_matrix <- cor(numericHousingData, use = "complete.obs")
 
 corr_df = data.frame(cor_matrix)
@@ -195,7 +204,9 @@ maxneg <- corr_df2[order(corr_df2$value),]
 # Correlation matrix including only the top positive and negative correlations
 names <- c(maxpos$var, maxneg$var)
 topcormat <- cor_matrix[names, names]
+```
 
+```{r, echo=FALSE, fig.cap="Correlation matrix of independent variables\\label{}"}
 # plot the correlation matrix
 # install.packages('corrplot')
 library(corrplot)
@@ -203,28 +214,48 @@ corrplot(topcormat, method='color', tl.cex=0.5)
 ```
 
 
-
 ## Other interesting but non-numeric variables 
+We also assessed some of the non-numeric variables in the dataset and discovered some interesting results.
 * Neighborhood
-* Street: Type of road access to property
-   + no predictive power; most likely irrelevant to house prices
-   + can be dropped
-* Utilities: Type of utilities available
-   + There is not much variability in the distribution of data. All observations but 3 have “AllPub” as their values for Utilities
-   + can be dropped
-* Roof.Matl: Roof material
-   + The most common data item "CompShg" occurs 2887 times out of 2930 observations 
-   + can be dropped
-```{r, echo=FALSE}
+   + There appears to be a significant difference in the average property sale price from neighborhood to neighborhood.
+* The dataset contains a good number of categorical variables with little variability in distribution and likely holds no predictive power
+   + Street: Type of road access to property
+   + Utilities: Type of utilities available
+   + Roof.Matl: Roof material
+```{r, echo=FALSE, fig.cap="Boxplot showing the distribution of SalePrice across Neighborhood\\label{}"}
 ggplot(housing, aes(x=Neighborhood,y=SalePrice)) + geom_boxplot(color="black", fill="yellow")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
 
+```{r, echo=FALSE,results=FALSE, message=FALSE}
 as.data.frame(table(housing$Street))
 as.data.frame(table(housing$Utilities))
 as.data.frame(table(housing$Roof.Matl))
 ```
+# Plan 
+\
+The primary objective of this feasibility study is to determine the viability and effectiveness of employing additive models, splines, and polynomial regression for predicting house prices. Specifically, we will evaluate the following: 
+
+* **Accuracy**: Assess the predictive accuracy of additive models, splines, and polynomial regression in comparison to traditional regression models commonly used in the real estate domain.
+
+* **Flexibility**: Analyze the ability of these techniques to capture complex relationships between house price predictors, such as square footage, location, number of bedrooms, and other relevant features.
+
+* **Interpretability**: Evaluate the interpretability and explainability of the models, ensuring that the predictions can be easily understood and justified by stakeholders. 
+
+\ 
+To achieve our objective, we propose the following methodology as an outline:
+
+* **Initial Benchmark**: We will investigate the accuracy of using linear regression with simple categorical encoding using the fulls et of features as an initial benchmark
+
+* **Data Preprocessing**: Perform necessary data preprocessing tasks, including cleaning, feature engineering, and handling missing values or outliers to ensure the data quality.  In an attempt to determine meaningful covariates, we are proposing to usage of clustering techniques such as Principal Component Analysis to remove extremely collinear covariates.
+
+* **Model Implementation**: Develop additive models, splines, and polynomial regression models using appropriate algorithms and frameworks, such as generalized additive models (GAMs) and polynomial regression libraries in R. We will also apply penalization techniques to prevent overfitting such as forward/backward selection or LASSO/Ridge regression while scaling up the number of covariates to include interaction terms in an attempt to model any non-linear relationships
+
+* **Model Evaluation**: Assess the performance of the models using appropriate evaluation metrics, such as mean squared error (MSE), root mean squared error (RMSE), and R-squared values and compare the results with benchmark models.
+
+* **Interpretation and Explainability**: Analyze the interpretability of the models, examining the contributions of each feature and the underlying relationships identified by the models. Utilize visualization techniques to present the results in a comprehensive and understandable manner.
 
 \newpage
-
+\newpage
 # Introduction
 This template helps you to create a properly formatted \LaTeXe\ manuscript.
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
@@ -426,6 +457,7 @@ instead of \verb|\newtheorem|.
 # Tables and figures
 Cross-references to labeled tables: As you can see in Table\ref{tab:mtc}
 and also in Table\ref{parset}.
+*/%
 
 ```{r mtc, echo = FALSE}
 knitr::kable(mtcars, caption = "Table caption", format = "latex", vline = "", linesep = "")
@@ -561,6 +593,8 @@ The second author was supported in part by NIH Grant ???????????.
 \stitle{Title of Supplement B}
 \sdescription{Short description of Supplement B.}
 \end{supplement}
+
+
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %%                  The Bibliography                       %% -->

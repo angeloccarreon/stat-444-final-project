@@ -201,6 +201,7 @@ outlines our dataset,
 \section{Introduction to our chosen
 dataset}\label{introduction-to-our-chosen-dataset}}
 
+\hfill\break
 Our proposal primarily aims to assess the feasibility of utilizing
 regression techniques for interpolating and modeling housing prices. To
 achieve this objective, we have selected a dataset from the Journal of
@@ -221,19 +222,11 @@ contributing to more informed decision-making in the industry.
 \begin{itemize}
 \tightlist
 \item
-  the dataset contains 2930 rows and 82 columns
+  The dataset contains 2930 rows and 82 columns
 \item
-  80 explanatory variables, 23 nominal, 23 ordinal, 14 discrete, and 20
-  continuous variates.
+  There are 80 explanatory variables, including 23 nominal, 23 ordinal,
+  14 discrete, and 20 continuous variables.
 \end{itemize}
-
-\begin{verbatim}
-## [1] 1460
-\end{verbatim}
-
-\begin{verbatim}
-## [1] 81
-\end{verbatim}
 
 \hypertarget{missingduplicate-values}{%
 \subsection{Missing/duplicate Values}\label{missingduplicate-values}}
@@ -241,46 +234,23 @@ contributing to more informed decision-making in the industry.
 \begin{itemize}
 \tightlist
 \item
-  some columns contain a large number of NAs
+  There are four columns where missing values are extensive and need to
+  be dropped as they are not critical to our analysis.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Pool.QC has only 13 observations
+  \item
+    Misc.Feature has only 106 observations
+  \item
+    Pool.QC has only 198 observations
+  \item
+    Fence has only 572 observations
+  \end{itemize}
 \item
-  0 duplicates
+  There are no duplicates rows
 \end{itemize}
-
-\begin{verbatim}
-## [1] 91
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: Unknown or uninitialised column: `Pool.QC`.
-\end{verbatim}
-
-\begin{verbatim}
-## [1] 0
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: Unknown or uninitialised column: `Misc.Feature`.
-\end{verbatim}
-
-\begin{verbatim}
-## [1] 0
-\end{verbatim}
-
-\begin{verbatim}
-## [1] 281
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: Unknown or uninitialised column: `Fireplace.Qu`.
-\end{verbatim}
-
-\begin{verbatim}
-## [1] 0
-\end{verbatim}
-
-\begin{verbatim}
-## [1]  0 81
-\end{verbatim}
 
 \hypertarget{distribution-of-dependent-variable}{%
 \subsection{Distribution of dependent
@@ -289,24 +259,28 @@ variable}\label{distribution-of-dependent-variable}}
 \begin{itemize}
 \tightlist
 \item
-  the distribution of Sale Price looks very right-skewed: most values
-  are clustered around the left tail while the right tail is longer
-  (extreme high values)
+  The distribution of Sale Price looks very right-skewed with most
+  values clustered around the left tail and a significantly longer right
+  tail, signifying extreme high values
 \item
   The sale prices range from \$12,789 to \$755,000 with a mean of
-  \$180,796 and a standard deviation of \$79,886.69.
+  \$180,796 and a standard deviation of \$79,886.69
 \item
-  Need to apply natural log transformation to address the non-normal
-  distribution
+  To achieve a more normal distribution, we will apply log
+  transformation on the dependent variable
 \end{itemize}
 
-\begin{verbatim}
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   34900  129975  163000  180921  214000  755000
-\end{verbatim}
+\begin{figure}
+\centering
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-5-1.pdf}
+\caption{Histogram of Sale Price\label{}}
+\end{figure}
 
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-4-1.pdf}
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-4-2.pdf}
+\begin{figure}
+\centering
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-6-1.pdf}
+\caption{Histogram of Log Sale Price\label{}}
+\end{figure}
 
 \hypertarget{correlations-with-the-dependent-variable}{%
 \subsection{Correlations with the dependent
@@ -315,7 +289,8 @@ variable}\label{correlations-with-the-dependent-variable}}
 \begin{itemize}
 \tightlist
 \item
-  Top 5 variables with the highest correlations:
+  Based on our correlation analysis, the top 5 numeric variables with
+  the highest correlations with our dependent variable are:
 
   \begin{itemize}
   \tightlist
@@ -332,134 +307,112 @@ variable}\label{correlations-with-the-dependent-variable}}
   \end{itemize}
 \end{itemize}
 
-\begin{verbatim}
-##  OverallQual    GrLivArea   GarageCars   GarageArea  TotalBsmtSF     1stFlrSF 
-##   0.79788068   0.70515357   0.64703361   0.61932962   0.61561224   0.60796911 
-##     FullBath TotRmsAbvGrd    YearBuilt YearRemodAdd  GarageYrBlt   MasVnrArea 
-##   0.56662744   0.54706736   0.52539360   0.52125327   0.50475302   0.48865815 
-##   Fireplaces   BsmtFinSF1  LotFrontage  OpenPorchSF   WoodDeckSF     2ndFlrSF 
-##   0.46187269   0.39030052   0.34426977   0.34335381   0.33685512   0.30687900 
-##      LotArea     HalfBath BsmtFullBath    BsmtUnfSF BedroomAbvGr  ScreenPorch 
-##   0.29996221   0.26856030   0.23673741   0.21312868   0.16681389   0.11042681 
-##     PoolArea       MoSold    3SsnPorch 
-##   0.09248812   0.05156806   0.03077659
-\end{verbatim}
-
-\begin{verbatim}
-## EnclosedPorch  KitchenAbvGr   OverallCond    MSSubClass            Id 
-##  -0.154843204  -0.140497445  -0.124391232  -0.088031702  -0.047121850 
-##  BsmtHalfBath       MiscVal    BsmtFinSF2        YrSold  LowQualFinSF 
-##  -0.036512665  -0.036041237  -0.028021366  -0.011868823  -0.001481983
-\end{verbatim}
-
 \hypertarget{check-if-there-is-a-high-degree-of-correlation-or-linear-association-among-independent-variables}{%
 \subsection{Check if there is a high degree of correlation or linear
 association among independent
 variables}\label{check-if-there-is-a-high-degree-of-correlation-or-linear-association-among-independent-variables}}
 
-\begin{verbatim}
-## Using var as id variables
-\end{verbatim}
+\begin{itemize}
+\tightlist
+\item
+  Some independent variables exemplify a strong correlation, which are
+  to be expected because they essentially provide similar informaion.
 
-\begin{verbatim}
-##               var     variable     value
-## 1016   GarageArea   GarageCars 0.8394149
-## 1053   GarageCars   GarageArea 0.8394149
-## 470      1stFlrSF  TotalBsmtSF 0.8359994
-## 507   TotalBsmtSF    X1stFlrSF 0.8359994
-## 632  TotRmsAbvGrd    GrLivArea 0.8243121
-## 891     GrLivArea TotRmsAbvGrd 0.8243121
-## 254   GarageYrBlt    YearBuilt 0.8235195
-## 957     YearBuilt  GarageYrBlt 0.8235195
-## 190     SalePrice  OverallQual 0.7978807
-## 1411  OverallQual    SalePrice 0.7978807
-## 646     SalePrice    GrLivArea 0.7051536
-## 1423    GrLivArea    SalePrice 0.7051536
-\end{verbatim}
+  \begin{itemize}
+  \tightlist
+  \item
+    For example, the high correlation between the variable
+    \textbf{Garage Area} (size of garage in square feet) and
+    \textbf{Garage Cars} (size of garage in car capacity) is not
+    surprising.
+  \item
+    To address this issue of redundancy, we will select one of them and
+    exclude the other from the analysis.
+  \end{itemize}
+\end{itemize}
 
-\begin{verbatim}
-## Using var as id variables
-\end{verbatim}
-
-\begin{verbatim}
-## [1] var      variable value   
-## <0 rows> (or 0-length row.names)
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: package 'corrplot' was built under R version 4.3.1
-\end{verbatim}
-
-\begin{verbatim}
-## corrplot 0.92 loaded
-\end{verbatim}
-
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-6-1.pdf}
+\begin{figure}
+\centering
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-9-1.pdf}
+\caption{Correlation matrix of independent variables\label{}}
+\end{figure}
 
 \hypertarget{other-interesting-but-non-numeric-variables}{%
 \subsection{Other interesting but non-numeric
 variables}\label{other-interesting-but-non-numeric-variables}}
 
+We also assessed some of the non-numeric variables in the dataset and
+discovered some interesting results. * Neighborhood + There appears to
+be a significant difference in the average property sale price from
+neighborhood to neighborhood. * The dataset contains a good number of
+categorical variables with little variability in distribution and likely
+holds no predictive power + Street: Type of road access to property +
+Utilities: Type of utilities available + Roof.Matl: Roof material
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\hypertarget{plan}{%
+\section{Plan}\label{plan}}
+
+\hfill\break
+The primary objective of this feasibility study is to determine the
+viability and effectiveness of employing additive models, splines, and
+polynomial regression for predicting house prices. Specifically, we will
+evaluate the following:
+
 \begin{itemize}
-\tightlist
 \item
-  Neighborhood
+  \textbf{Accuracy}: Assess the predictive accuracy of additive models,
+  splines, and polynomial regression in comparison to traditional
+  regression models commonly used in the real estate domain.
 \item
-  Street: Type of road access to property
-
-  \begin{itemize}
-  \tightlist
-  \item
-    no predictive power; most likely irrelevant to house prices
-  \item
-    can be dropped
-  \end{itemize}
+  \textbf{Flexibility}: Analyze the ability of these techniques to
+  capture complex relationships between house price predictors, such as
+  square footage, location, number of bedrooms, and other relevant
+  features.
 \item
-  Utilities: Type of utilities available
-
-  \begin{itemize}
-  \tightlist
-  \item
-    There is not much variability in the distribution of data. All
-    observations but 3 have ``AllPub'' as their values for Utilities
-  \item
-    can be dropped
-  \end{itemize}
-\item
-  Roof.Matl: Roof material
-
-  \begin{itemize}
-  \tightlist
-  \item
-    The most common data item ``CompShg'' occurs 2887 times out of 2930
-    observations
-  \item
-    can be dropped
-    \includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-7-1.pdf}
-  \end{itemize}
+  \textbf{Interpretability}: Evaluate the interpretability and
+  explainability of the models, ensuring that the predictions can be
+  easily understood and justified by stakeholders.
 \end{itemize}
 
-\begin{verbatim}
-##   Var1 Freq
-## 1 Grvl    6
-## 2 Pave 1454
-\end{verbatim}
+~ To achieve our objective, we propose the following methodology as an
+outline:
 
-\begin{verbatim}
-##     Var1 Freq
-## 1 AllPub 1459
-## 2 NoSeWa    1
-\end{verbatim}
+\begin{itemize}
+\item
+  \textbf{Initial Benchmark}: We will investigate the accuracy of using
+  linear regression with simple categorical encoding using the fulls et
+  of features as an initial benchmark
+\item
+  \textbf{Data Preprocessing}: Perform necessary data preprocessing
+  tasks, including cleaning, feature engineering, and handling missing
+  values or outliers to ensure the data quality. In an attempt to
+  determine meaningful covariates, we are proposing to usage of
+  clustering techniques such as Principal Component Analysis to remove
+  extremely collinear covariates.
+\item
+  \textbf{Model Implementation}: Develop additive models, splines, and
+  polynomial regression models using appropriate algorithms and
+  frameworks, such as generalized additive models (GAMs) and polynomial
+  regression libraries in R. We will also apply penalization techniques
+  to prevent overfitting such as forward/backward selection or
+  LASSO/Ridge regression while scaling up the number of covariates to
+  include interaction terms in an attempt to model any non-linear
+  relationships
+\item
+  \textbf{Model Evaluation}: Assess the performance of the models using
+  appropriate evaluation metrics, such as mean squared error (MSE), root
+  mean squared error (RMSE), and R-squared values and compare the
+  results with benchmark models.
+\item
+  \textbf{Interpretation and Explainability}: Analyze the
+  interpretability of the models, examining the contributions of each
+  feature and the underlying relationships identified by the models.
+  Utilize visualization techniques to present the results in a
+  comprehensive and understandable manner.
+\end{itemize}
 
-\begin{verbatim}
-## Warning: Unknown or uninitialised column: `Roof.Matl`.
-\end{verbatim}
-
-\begin{verbatim}
-## [1] Freq
-## <0 rows> (or 0-length row.names)
-\end{verbatim}
-
+\newpage
 \newpage
 
 \hypertarget{introduction}{%
@@ -710,7 +663,7 @@ This is the body of the fact. Fact is unnumbered because we used
 \section{Tables and figures}\label{tables-and-figures}}
 
 Cross-references to labeled tables: As you can see in Table\ref{tab:mtc}
-and also in Table\ref{parset}.
+and also in Table\ref{parset}. */\%
 
 \begin{table}
 
@@ -788,7 +741,7 @@ Std. dev.&
 
 \begin{figure}
 \centering
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-8-1.pdf}
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-12-1.pdf}
 \caption{Figure caption\label{penG}}
 \end{figure}
 

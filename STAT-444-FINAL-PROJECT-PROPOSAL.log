@@ -1,0 +1,88 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.10.20)  21 JUN 2023 23:16
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**STAT-444-FINAL-PROJECT-PROPOSAL.tex
+(./STAT-444-FINAL-PROJECT-PROPOSAL.tex
+LaTeX2e <2022-06-01> patch level 5
+L3 programming layer <2022-09-28> (./imsart.cls
+Document Class: imsart 2020/08/23 driver class for package imsart.sty
+(c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/leqno.clo
+File: leqno.clo 2016/12/29 v1.2b Standard LaTeX option (left equation numbers)
+) (c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size11.clo
+File: size11.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count185
+\c@section=\count186
+\c@subsection=\count187
+\c@subsubsection=\count188
+\c@paragraph=\count189
+\c@subparagraph=\count190
+\c@figure=\count191
+\c@table=\count192
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+) (./imsart.sty
+File: imsart.sty 2020/11/02 IMS article style
+(c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count193
+)
+No file imsart.cnf.
+(c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/leqno.clo
+File: leqno.clo 2016/12/29 v1.2b Standard LaTeX option (left equation numbers)
+)
+\c@firstpage=\count194
+\c@lastpage=\count195
+\c@thanks=\count196
+\c@addressref=\count197
+(c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+\c@emailref=\count198
+\c@author=\count199
+\c@address=\count266
+\sv@mathsurround=\dimen139
+\sv@parindent=\dimen140
+\fm@box=\box51
+\fm@size=\dimen141
+\t@xtheight=\dimen142
+\abstract@box=\box52
+\keyword@box=\box53
+\pre@kwd@depth=\dimen143
+\keyword@toks=\toks17
+(c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+) (c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/times.sty
+Package: times 2020/03/25 PSNFSS-v9.3 (SPQR) 
+) (c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/helvet.sty
+Package: helvet 2020/03/25 PSNFSS-v9.3 (WaS) 
+) (c:/Users/joych/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+)
+
+! LaTeX Error: File `textcase.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.2453     \def
+               \@xipt{11}^^M 
+Here is how much of TeX's memory you used:
+ 1451 strings out of 477031
+ 19936 string characters out of 5826140
+ 355272 words of memory out of 5000000
+ 22659 multiletter control sequences out of 15000+600000
+ 470328 words of font info for 30 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 61i,0n,67p,175b,38s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+!  ==> Fatal error occurred, no output PDF file produced!
