@@ -76,7 +76,15 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 
 # Introduction to our chosen dataset 
 \
-Our proposal primarily aims to assess the feasibility of utilizing regression techniques for interpolating and modeling housing prices. To achieve this objective, we have selected a dataset from the Journal of Statistics, which includes housing prices in Ames, Iowa, along with other pertinent features. In today's dynamic real estate market, precise and dependable house price predictions hold immense significance for homeowners, buyers, and real estate professionals alike. By delving into the potential of these advanced modeling techniques, our goal is to augment the accuracy and reliability of house price predictions, contributing to more informed decision-making in the industry.
+Our project aims to assess the feasibility of utilizing
+regression techniques for interpolating and modeling housing prices. From the 
+Journal of Statistics, we have selected a dataset of housing prices in Ames, 
+Iowa, along with other pertinent features. In today's dynamic real estate 
+market, precise and dependable housing price predictions hold immense 
+significance for homeowners, buyers, and real estate professionals alike. By 
+tapping into the potential of advanced modeling techniques, our goal is to
+improve the accuracy and reliability of housing price predictions,
+contributing to more informed decision-making in the industry.
 
 # Exploratory Data Analysis
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
@@ -84,8 +92,9 @@ housing <- read_csv("house-prices-advanced-regression-techniques/train.csv")
 ```
 
 ## Summary Statistics 
-* The dataset contains 2930 rows and 82 columns
-* There are 80 explanatory variables, including 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables.
+* The dataset contains 2930 rows and 82 columns.
+* There are 80 explanatory variables, including 23 nominal, 23 ordinal, 14 
+discrete, and 20 continuous variables.
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
 nrow(housing)
 ncol(housing)
@@ -96,12 +105,14 @@ housing <- housing[ , !(names(housing) == "Order")]
 
 
 ## Missing/duplicate Values
-* There are four columns where missing values are extensive and need to be dropped as they are not critical to our analysis.
-    + Pool.QC has only 13 observations
-    + Misc.Feature has only 106 observations
-    + Pool.QC has only 198 observations
-    + Fence has only 572 observations
-* There are no duplicates rows
+* Four columns contain many missing values and are thus dropped, as they are not critical to our analysis.
+\vspace{0.2cm}
+    + Pool.QC has only 13 observations.
+    + Misc.Feature has only 106 observations.
+    + Pool.QC has only 198 observations.
+    + Fence has only 572 observations.
+    \vspace{0.2cm}
+* There are no duplicate rows.
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
 # Alley: Type of alley access to property
 sum(!is.na(housing$Alley))      # only 198 observations
@@ -125,26 +136,26 @@ dim(duplicates)
 
 
 
-## Distribution of dependent variable
-* The distribution of Sale Price looks very right-skewed with
-most values clustered around the left tail and a significantly longer right tail, signifying extreme high values
-* The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69
-* To achieve a more normal distribution, we will apply log transformation on the dependent variable
+## Distribution of dependent variable: \texttt{Sale Price}
+* The distribution of \texttt{Sale Price} is significantly right-skewed.
+* The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69.
+* To achieve a more normal distribution, we can apply a log transformation on the dependent variable.
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
 summary(housing$SalePrice)
 ```
 
-```{r, echo=FALSE, fig.cap="Histogram of Sale Price\\label{}"}
+```{r, echo=FALSE, fig.show='hold', fig.align='center', fig.cap="Histogram of Sale Price (top) and Log Sale Price (bottom)\\label{}"}
 options(scipen=10)
+
+# Plot sale price.
 hist(housing$SalePrice, xlab = "Property Sale Price", main = "Histogram of Sale Price")
 lines(housing$SalePrice, col = 4, lwd = 2)
-par(new=TRUE)   
+par(new=TRUE)
 plot(density(housing$SalePrice), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
-```
 
-```{r, echo=FALSE, fig.cap="Histogram of Log Sale Price\\label{}"}
+# Plot log sale price.
 hist(log(housing$SalePrice), xlab = "log(Sale Price)", main = "Histogram of log(Sale Price)", breaks = 20)
 par(new=TRUE)   
 plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
@@ -152,14 +163,17 @@ plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
 axis(4, las=1)
 ```
 
+\hfill\break
 
 ## Correlations with the dependent variable
-* Based on our correlation analysis, the top 5 numeric variables with the highest correlations with our dependent variable are:
-  + Overall.Qual: Rates the overall material and finish of the house
-  + Gr.Liv.Area: Above grade (ground) living area square feet
-  + Garage.Cars:  Size of garage in car capacity
-  + Garage.Area:  Size of garage in square feet
-  + Total.Bsmt.SF: Total square feet of basement area
+* Based on our correlation analysis, the five numeric variables with
+  the highest correlations with our dependent variable are:
+  \vspace{0.2cm}
+  + Overall.Qual: Rates the overall material and finish of the house.
+  + Gr.Liv.Area: Above grade (ground) living area square feet.
+  + Garage.Cars:  Size of garage in car capacity.
+  + Garage.Area:  Size of garage in square feet.
+  + Total.Bsmt.SF: Total square feet of basement area.
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
 # Subset of numeric columns
 numericHousingData <- newHousing[, sapply(newHousing, is.numeric)]
@@ -178,11 +192,11 @@ print(sort(negCorrelations,decreasing=FALSE))
 ```
 
 
-
 ## Check if there is a high degree of correlation or linear association among independent variables
-* Some independent variables exemplify a strong correlation, which are to be expected because they essentially provide similar informaion.
+* Some independent variables are strongly correlated; this behavior is to be expected, as some covariates provide similar information.
+\vspace{0.2cm}
   + For example, the high correlation between the variable **Garage Area** (size of garage in square feet) and **Garage Cars** (size of garage in car capacity) is not surprising.
-  + To address this issue of redundancy, we will select one of them and exclude the other from the analysis.
+  + To address such redundant pairs, we will select one covariate from each pair, excluding the other from the analysis.
 ```{r, echo=FALSE,results=FALSE, message=FALSE}
 cor_matrix <- cor(numericHousingData, use = "complete.obs")
 
@@ -213,15 +227,26 @@ library(corrplot)
 corrplot(topcormat, method='color', tl.cex=0.5)
 ```
 
+\hfill\break
 
-## Other interesting but non-numeric variables 
-We also assessed some of the non-numeric variables in the dataset and discovered some interesting results.
-* Neighborhood
-   + There appears to be a significant difference in the average property sale price from neighborhood to neighborhood.
-* The dataset contains a good number of categorical variables with little variability in distribution and likely holds no predictive power
-   + Street: Type of road access to property
-   + Utilities: Type of utilities available
-   + Roof.Matl: Roof material
+## Other interesting but non-numeric variables
+\
+\
+We note some non-numeric variables of interest below.
+
+\begin{itemize}
+    \item \textbf{Neighborhood.} There appears to
+be a significant difference in the average property sale price by neighborhood.
+\vspace{0.2cm}
+\item The dataset contains several categorical variables with low variance (i.e. near-constant), which likely hold negligible predictive power, including:
+\vspace{0.2cm}
+\begin{itemize}
+    \item \texttt{Street} - type of road access to property
+    \item \texttt{Utilities} - type of utilities available
+    \item \texttt{Roof.Matl} - roof material
+\end{itemize}
+\end{itemize}
+
 ```{r, echo=FALSE, fig.cap="Boxplot showing the distribution of SalePrice across Neighborhood\\label{}"}
 ggplot(housing, aes(x=Neighborhood,y=SalePrice)) + geom_boxplot(color="black", fill="yellow")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
@@ -231,336 +256,374 @@ as.data.frame(table(housing$Street))
 as.data.frame(table(housing$Utilities))
 as.data.frame(table(housing$Roof.Matl))
 ```
+
+\newpage
+
 # Plan 
 \
-The primary objective of this feasibility study is to determine the viability and effectiveness of employing additive models, splines, and polynomial regression for predicting house prices. Specifically, we will evaluate the following: 
+\
+The objective of this study is to determine the
+viability and effectiveness of employing additive models, splines, and
+polynomial regression for predicting house prices. We focus our attention on the following:
 
-* **Accuracy**: Assess the predictive accuracy of additive models, splines, and polynomial regression in comparison to traditional regression models commonly used in the real estate domain.
+\begin{itemize}
+\item
+  \textbf{Accuracy}: Assess the predictive accuracy of additive models,
+  splines, and polynomial regression in comparison to traditional
+  regression models commonly used in the real estate domain.
+    \vspace{0.2cm}
+\item
+  \textbf{Flexibility}: Analyze the ability of these techniques to
+  capture complex relationships between house price predictors, such as
+  square footage, location, number of bedrooms, and other relevant
+  features.
+  \vspace{0.2cm}
+\item
+  \textbf{Interpretability}: Evaluate the interpretability and
+  explainability of the models, ensuring that the predictions can be
+  easily understood and justified by stakeholders.
+  \vspace{0.2cm}
+\end{itemize}
+To achieve our objective, we propose the following methodology as an
+outline:
 
-* **Flexibility**: Analyze the ability of these techniques to capture complex relationships between house price predictors, such as square footage, location, number of bedrooms, and other relevant features.
+\begin{enumerate}
+\item
+  \textbf{Initial Benchmark}: Use the performance of linear regression, with simple categorical encoding, on the full
+  feature set as an initial benchmark.
+  \vspace{0.2cm}
+\item
+  \textbf{Data Preprocessing}: Handle missing/invalid values and outliers and perform feature engineering to enhance
+  the models' predictions. To mitigate the ``curse of dimensionality" and reduce collinearity in the dataset, we
+   will use a low variance filter and clustering techniques such as Principal Component Analysis (PCA).
+   \vspace{0.2cm}
+\item
+  \textbf{Model Implementation}: Develop additive models, splines, and
+  polynomial regression models using appropriate algorithms and
+  frameworks, such as generalized additive models (GAMs) and polynomial
+  regression libraries in R. We will also apply penalization techniques
+  to prevent overfitting (e.g. forward/backward selection, LASSO/Ridge regression)
+  while including interactions between covariates to model any non-linear relationships.
+  \vspace{0.2cm}
+\item
+  \textbf{Model Evaluation}: Assess the performance of the models using
+  appropriate evaluation metrics, such as mean squared error (MSE), root
+  mean squared error (RMSE), and R-squared values and compare the
+  results with benchmark models.
+  \vspace{0.2cm}
+\item
+  \textbf{Interpretation and Explainability}: Examine the contributions of each
+  feature and the underlying relationships identified by the models. Visualize the results in an intuitive yet
+  comprehensive manner.
+\end{enumerate}
 
-* **Interpretability**: Evaluate the interpretability and explainability of the models, ensuring that the predictions can be easily understood and justified by stakeholders. 
-
-\ 
-To achieve our objective, we propose the following methodology as an outline:
-
-* **Initial Benchmark**: We will investigate the accuracy of using linear regression with simple categorical encoding using the fulls et of features as an initial benchmark
-
-* **Data Preprocessing**: Perform necessary data preprocessing tasks, including cleaning, feature engineering, and handling missing values or outliers to ensure the data quality.  In an attempt to determine meaningful covariates, we are proposing to usage of clustering techniques such as Principal Component Analysis to remove extremely collinear covariates.
-
-* **Model Implementation**: Develop additive models, splines, and polynomial regression models using appropriate algorithms and frameworks, such as generalized additive models (GAMs) and polynomial regression libraries in R. We will also apply penalization techniques to prevent overfitting such as forward/backward selection or LASSO/Ridge regression while scaling up the number of covariates to include interaction terms in an attempt to model any non-linear relationships
-
-* **Model Evaluation**: Assess the performance of the models using appropriate evaluation metrics, such as mean squared error (MSE), root mean squared error (RMSE), and R-squared values and compare the results with benchmark models.
-
-* **Interpretation and Explainability**: Analyze the interpretability of the models, examining the contributions of each feature and the underlying relationships identified by the models. Utilize visualization techniques to present the results in a comprehensive and understandable manner.
-
-\newpage
-\newpage
-# Introduction
-This template helps you to create a properly formatted \LaTeXe\ manuscript.
+<!-- \newpage -->
+<!-- \newpage -->
+<!-- # Introduction -->
+<!-- This template helps you to create a properly formatted \LaTeXe\ manuscript. -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %% `\ ' is used here because TeX ignores    %% -->
 <!-- %% spaces after text commands.              %% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
-Prepare your paper in the same style as used in this sample .pdf file.
-Try to avoid excessive use of italics and bold face.
-Please do not use any \LaTeXe\ or \TeX\ commands that affect the layout
-or formatting of your document (i.e., commands like \verb|\textheight|,
-\verb|\textwidth|, etc.).
+<!-- Prepare your paper in the same style as used in this sample .pdf file. -->
+<!-- Try to avoid excessive use of italics and bold face. -->
+<!-- Please do not use any \LaTeXe\ or \TeX\ commands that affect the layout -->
+<!-- or formatting of your document (i.e., commands like \verb|\textheight|, -->
+<!-- \verb|\textwidth|, etc.). -->
 
-# Section headings
+<!-- # Section headings -->
 
-Here are some sub-sections:
+<!-- Here are some sub-sections: -->
 
-## A sub-section
+<!-- ## A sub-section -->
 
-Regular text.
+<!-- Regular text. -->
 
-### A sub-sub-section
+<!-- ### A sub-sub-section -->
 
-Regular text.
+<!-- Regular text. -->
 
-# Text
+<!-- # Text -->
 
-## Lists
+<!-- ## Lists -->
 
-The following is an example of an *itemized* list, two levels deep.
- 
-* This is the first item of an itemized list.  Each item
-  in the list is marked with a "tick." The document
-  style determines what kind of tick mark is used.
-* This is the second item of the list.  It contains another
-  list nested inside it.
-  - This is the first item of an itemized list that
-    is nested within the itemized list.
-  - This is the second item of the inner list.  \LaTeX\
-    allows you to nest lists deeper than you really should.
-- This is the third item of the list.
+<!-- The following is an example of an *itemized* list, two levels deep. -->
 
-The following is an example of an *enumerated* list of one level.
+<!-- * This is the first item of an itemized list.  Each item -->
+<!--   in the list is marked with a "tick." The document -->
+<!--   style determines what kind of tick mark is used. -->
+<!-- * This is the second item of the list.  It contains another -->
+<!--   list nested inside it. -->
+<!--   - This is the first item of an itemized list that -->
+<!--     is nested within the itemized list. -->
+<!--   - This is the second item of the inner list.  \LaTeX\ -->
+<!--     allows you to nest lists deeper than you really should. -->
+<!-- - This is the third item of the list. -->
 
-\begin{longlist}
-\item This is the first item of an enumerated list.
-\item This is the second item of an enumerated list.
-\end{longlist}
+<!-- The following is an example of an *enumerated* list of one level. -->
 
-The following is an example of an *enumerated* list, two levels deep.
-\begin{longlist}
-\item[1.]
-This is the first item of an enumerated list.  Each item
-in the list is marked with a ``tick.''.  The document
-style determines what kind of tick mark is used.
-\item[2.]
-This is the second item of the list.  It contains another
-list nested inside of it.
-\begin{longlist}
-\item
-This is the first item of an enumerated list that
-is nested within.  
-\item
-This is the second item of the inner list.  \LaTeX\
-allows you to nest lists deeper than you really should.
-\end{longlist}
-This is the rest of the second item of the outer list.
-\item[3.]
-This is the third item of the list.
-\end{longlist}
+<!-- \begin{longlist} -->
+<!-- \item This is the first item of an enumerated list. -->
+<!-- \item This is the second item of an enumerated list. -->
+<!-- \end{longlist} -->
 
-## Punctuation
+<!-- The following is an example of an *enumerated* list, two levels deep. -->
+<!-- \begin{longlist} -->
+<!-- \item[1.] -->
+<!-- This is the first item of an enumerated list.  Each item -->
+<!-- in the list is marked with a ``tick.''.  The document -->
+<!-- style determines what kind of tick mark is used. -->
+<!-- \item[2.] -->
+<!-- This is the second item of the list.  It contains another -->
+<!-- list nested inside of it. -->
+<!-- \begin{longlist} -->
+<!-- \item -->
+<!-- This is the first item of an enumerated list that -->
+<!-- is nested within.   -->
+<!-- \item -->
+<!-- This is the second item of the inner list.  \LaTeX\ -->
+<!-- allows you to nest lists deeper than you really should. -->
+<!-- \end{longlist} -->
+<!-- This is the rest of the second item of the outer list. -->
+<!-- \item[3.] -->
+<!-- This is the third item of the list. -->
+<!-- \end{longlist} -->
 
-Dashes come in three sizes: a hyphen, an intra-word dash like "$U$-statistics" or "the time-homogeneous model";
-a medium dash (also called an "en-dash") for number ranges or between two equal entities like "1--2" or "Cauchy--Schwarz inequality";
-and a punctuation dash (also called an "em-dash") in place of a comma, semicolon,
-colon or parentheses---like this.
+<!-- ## Punctuation -->
 
-Generating an ellipsis \ldots\ with the right spacing
-around the periods requires a special command.
+<!-- Dashes come in three sizes: a hyphen, an intra-word dash like "$U$-statistics" or "the time-homogeneous model"; -->
+<!-- a medium dash (also called an "en-dash") for number ranges or between two equal entities like "1--2" or "Cauchy--Schwarz inequality"; -->
+<!-- and a punctuation dash (also called an "em-dash") in place of a comma, semicolon, -->
+<!-- colon or parentheses---like this. -->
 
-## Citation
+<!-- Generating an ellipsis \ldots\ with the right spacing -->
+<!-- around the periods requires a special command. -->
 
-Simple author and year cite: @billingsley2013convergence.
-Multiple bibliography items cite: \cite{billingsley2013convergence,bourbaki1966general} or [@billingsley2013convergence; @bourbaki1966general].
-Author only cite: \citeauthor{ethier1985markov}.
-Year only cite: \citeyear{prokhorov1956convergence} or [-@prokhorov1956convergence].
+<!-- ## Citation -->
 
-# Fonts
+<!-- Simple author and year cite: @billingsley2013convergence. -->
+<!-- Multiple bibliography items cite: \cite{billingsley2013convergence,bourbaki1966general} or [@billingsley2013convergence; @bourbaki1966general]. -->
+<!-- Author only cite: \citeauthor{ethier1985markov}. -->
+<!-- Year only cite: \citeyear{prokhorov1956convergence} or [-@prokhorov1956convergence]. -->
 
-Please use text fonts in text mode, e.g.:
-\begin{itemize}
-\item[]\textrm{Roman}
-\item[]\textit{Italic}
-\item[]\textbf{Bold}
-\item[]\textsc{Small Caps}
-\item[]\textsf{Sans serif}
-\item[]\texttt{Typewriter}
-\end{itemize}
-Please use mathematical fonts in mathematical mode, e.g.:
-\begin{itemize}
-\item[] $\mathrm{ABCabc123}$
-\item[] $\mathit{ABCabc123}$
-\item[] $\mathbf{ABCabc123}$
-\item[] $\boldsymbol{ABCabc123\alpha\beta\gamma}$
-\item[] $\mathcal{ABC}$
-\item[] $\mathbb{ABC}$
-\item[] $\mathsf{ABCabc123}$
-\item[] $\mathtt{ABCabc123}$
-\item[] $\mathfrak{ABCabc123}$
-\end{itemize}
-Note that \verb|\mathcal, \mathbb| belongs to capital letters-only font typefaces.
+<!-- # Fonts -->
 
-# Notes
+<!-- Please use text fonts in text mode, e.g.: -->
+<!-- \begin{itemize} -->
+<!-- \item[]\textrm{Roman} -->
+<!-- \item[]\textit{Italic} -->
+<!-- \item[]\textbf{Bold} -->
+<!-- \item[]\textsc{Small Caps} -->
+<!-- \item[]\textsf{Sans serif} -->
+<!-- \item[]\texttt{Typewriter} -->
+<!-- \end{itemize} -->
+<!-- Please use mathematical fonts in mathematical mode, e.g.: -->
+<!-- \begin{itemize} -->
+<!-- \item[] $\mathrm{ABCabc123}$ -->
+<!-- \item[] $\mathit{ABCabc123}$ -->
+<!-- \item[] $\mathbf{ABCabc123}$ -->
+<!-- \item[] $\boldsymbol{ABCabc123\alpha\beta\gamma}$ -->
+<!-- \item[] $\mathcal{ABC}$ -->
+<!-- \item[] $\mathbb{ABC}$ -->
+<!-- \item[] $\mathsf{ABCabc123}$ -->
+<!-- \item[] $\mathtt{ABCabc123}$ -->
+<!-- \item[] $\mathfrak{ABCabc123}$ -->
+<!-- \end{itemize} -->
+<!-- Note that \verb|\mathcal, \mathbb| belongs to capital letters-only font typefaces. -->
 
-Footnotes[^1]
-pose no problem.[^2]
+<!-- # Notes -->
 
-[^1]: This is an example of a footnote.
-[^2]: Note that footnote number is after punctuation.
+<!-- Footnotes[^1] -->
+<!-- pose no problem.[^2] -->
 
-# Quotations
+<!-- [^1]: This is an example of a footnote. -->
+<!-- [^2]: Note that footnote number is after punctuation. -->
 
-Text is displayed by indenting it from the left margin. There are short quotations
+<!-- # Quotations -->
 
-> This is a short quotation.  It consists of a
-> single paragraph of text.  There is no paragraph
-> indentation.
+<!-- Text is displayed by indenting it from the left margin. There are short quotations -->
 
-and longer ones.
+<!-- > This is a short quotation.  It consists of a -->
+<!-- > single paragraph of text.  There is no paragraph -->
+<!-- > indentation. -->
+
+<!-- and longer ones. -->
 
 <!-- custom blocks syntax https://bookdown.org/yihui/rmarkdown-cookbook/custom-blocks.html -->
 
-::: {.quotation data-latex=""}
-This is a longer quotation.  It consists of two paragraphs
-of text.  The beginning of each paragraph is indicated
-by an extra indentation.
+<!-- ::: {.quotation data-latex=""} -->
+<!-- This is a longer quotation.  It consists of two paragraphs -->
+<!-- of text.  The beginning of each paragraph is indicated -->
+<!-- by an extra indentation. -->
 
-This is the second paragraph of the quotation.  It is just
-as dull as the first paragraph.
-:::
+<!-- This is the second paragraph of the quotation.  It is just -->
+<!-- as dull as the first paragraph. -->
+<!-- ::: -->
 
-# Environments
+<!-- # Environments -->
 
-## Examples for *`plain`-style environments*
+<!-- ## Examples for *`plain`-style environments* -->
 
-::: {.axiom data-latex=""}
-\label{ax1}
-This is the body of Axiom \ref{ax1}.
-:::
+<!-- ::: {.axiom data-latex=""} -->
+<!-- \label{ax1} -->
+<!-- This is the body of Axiom \ref{ax1}. -->
+<!-- ::: -->
 
-::: {.proof data-latex=""}
-This is the body of the proof of the axiom above.
-:::
+<!-- ::: {.proof data-latex=""} -->
+<!-- This is the body of the proof of the axiom above. -->
+<!-- ::: -->
 
-::: {.claim data-latex=""}
-\label{cl1}
-This is the body of Claim \ref{cl1}. Claim \ref{cl1} is numbered after
-Axiom \ref{ax1} because we used \verb|[axiom]| in \verb|\newtheorem|.
-:::
+<!-- ::: {.claim data-latex=""} -->
+<!-- \label{cl1} -->
+<!-- This is the body of Claim \ref{cl1}. Claim \ref{cl1} is numbered after -->
+<!-- Axiom \ref{ax1} because we used \verb|[axiom]| in \verb|\newtheorem|. -->
+<!-- ::: -->
 
-::: {.theorem data-latex=""}
-\label{th1}
-This is the body of Theorem \ref{th1}. Theorem \ref{th1} numbering is
-dependent on section because we used \verb|[section]| after \verb|\newtheorem|.
-:::
+<!-- ::: {.theorem data-latex=""} -->
+<!-- \label{th1} -->
+<!-- This is the body of Theorem \ref{th1}. Theorem \ref{th1} numbering is -->
+<!-- dependent on section because we used \verb|[section]| after \verb|\newtheorem|. -->
+<!-- ::: -->
 
-::: {.theorem data-latex="[Title of the theorem]"}
-\label{th2}
-This is the body of Theorem \ref{th2}. Theorem \ref{th2} has additional title.
-:::
+<!-- ::: {.theorem data-latex="[Title of the theorem]"} -->
+<!-- \label{th2} -->
+<!-- This is the body of Theorem \ref{th2}. Theorem \ref{th2} has additional title. -->
+<!-- ::: -->
 
-::: {.lemma data-latex=""}
-\label{le1}
-This is the body of Lemma \ref{le1}. Lemma \ref{le1} is numbered after
-Theorem \ref{th2} because we used \verb|[theorem]| in \verb|\newtheorem|.
-:::
+<!-- ::: {.lemma data-latex=""} -->
+<!-- \label{le1} -->
+<!-- This is the body of Lemma \ref{le1}. Lemma \ref{le1} is numbered after -->
+<!-- Theorem \ref{th2} because we used \verb|[theorem]| in \verb|\newtheorem|. -->
+<!-- ::: -->
 
-::: {.proof data-latex="[Proof of Lemma \ref{le1}]"}
-This is the body of the proof of Lemma \ref{le1}.
-:::
+<!-- ::: {.proof data-latex="[Proof of Lemma \ref{le1}]"} -->
+<!-- This is the body of the proof of Lemma \ref{le1}. -->
+<!-- ::: -->
 
-## Examples for *`remark`*-style environments
-::: {.definition data-latex=""}
-\label{de1}
-This is the body of Definition \ref{de1}. Definition \ref{de1} is numbered after
-Lemma \ref{le1} because we used \verb|[theorem]| in \verb|\newtheorem|.
-:::
+<!-- ## Examples for *`remark`*-style environments -->
+<!-- ::: {.definition data-latex=""} -->
+<!-- \label{de1} -->
+<!-- This is the body of Definition \ref{de1}. Definition \ref{de1} is numbered after -->
+<!-- Lemma \ref{le1} because we used \verb|[theorem]| in \verb|\newtheorem|. -->
+<!-- ::: -->
 
-::: {.example data-latex=""}
-This is the body of the example. Example is unnumbered because we used \verb|\newtheorem*|
-instead of \verb|\newtheorem|.
-:::
+<!-- ::: {.example data-latex=""} -->
+<!-- This is the body of the example. Example is unnumbered because we used \verb|\newtheorem*| -->
+<!-- instead of \verb|\newtheorem|. -->
+<!-- ::: -->
 
-::: {.fact data-latex=""}
-This is the body of the fact. Fact is unnumbered because we used \verb|\newtheorem*|
-instead of \verb|\newtheorem|.
-:::
+<!-- ::: {.fact data-latex=""} -->
+<!-- This is the body of the fact. Fact is unnumbered because we used \verb|\newtheorem*| -->
+<!-- instead of \verb|\newtheorem|. -->
+<!-- ::: -->
 
-# Tables and figures
-Cross-references to labeled tables: As you can see in Table\ref{tab:mtc}
-and also in Table\ref{parset}.
-*/%
+<!-- # Tables and figures -->
+<!-- Cross-references to labeled tables: As you can see in Table\ref{tab:mtc} -->
+<!-- and also in Table\ref{parset}. -->
+<!-- */% -->
 
-```{r mtc, echo = FALSE}
-knitr::kable(mtcars, caption = "Table caption", format = "latex", vline = "", linesep = "")
-```
+<!-- ```{r mtc, echo = FALSE} -->
+<!-- knitr::kable(mtcars, caption = "Table caption", format = "latex", vline = "", linesep = "") -->
+<!-- ``` -->
 
-\begin{table}
-\caption{Sample posterior estimates for each model}
-\label{parset}
-%
-\begin{tabular}{@{}lcrcrrr@{}}
-\hline
-&& & &\multicolumn{3}{c}{Quantile} \\
-\cline{5-7}
-Model &Parameter &
-\multicolumn{1}{c}{Mean} &
-Std. dev.&
-\multicolumn{1}{c}{2.5\%} &
-\multicolumn{1}{c}{50\%}&
-\multicolumn{1}{c@{}}{97.5\%} \\
-\hline
-{Model 0} & $\beta_0$ & $-$12.29 & 2.29 & $-$18.04 & $-$11.99 & $-$8.56 \\
-          & $\beta_1$  & 0.10   & 0.07 & $-$0.05  & 0.10   & 0.26  \\
-          & $\beta_2$   & 0.01   & 0.09 & $-$0.22  & 0.02   & 0.16  \\[6pt]
-{Model 1} & $\beta_0$   & $-$4.58  & 3.04 & $-$11.00 & $-$4.44  & 1.06  \\
-          & $\beta_1$   & 0.79   & 0.21 & 0.38   & 0.78   & 1.20  \\
-          & $\beta_2$   & $-$0.28  & 0.10 & $-$0.48  & $-$0.28  & $-$0.07 \\[6pt]
-{Model 2} & $\beta_0$   & $-$11.85 & 2.24 & $-$17.34 & $-$11.60 & $-$7.85 \\
-          & $\beta_1$   & 0.73   & 0.21 & 0.32   & 0.73   & 1.16  \\
-          & $\beta_2$   & $-$0.60  & 0.14 & $-$0.88  & $-$0.60  & $-$0.34 \\
-          & $\beta_3$   & 0.22   & 0.17 & $-$0.10  & 0.22   & 0.55  \\
-\hline
-\end{tabular}
-%
-\end{table}
+<!-- \begin{table} -->
+<!-- \caption{Sample posterior estimates for each model} -->
+<!-- \label{parset} -->
+<!-- % -->
+<!-- \begin{tabular}{@{}lcrcrrr@{}} -->
+<!-- \hline -->
+<!-- && & &\multicolumn{3}{c}{Quantile} \\ -->
+<!-- \cline{5-7} -->
+<!-- Model &Parameter & -->
+<!-- \multicolumn{1}{c}{Mean} & -->
+<!-- Std. dev.& -->
+<!-- \multicolumn{1}{c}{2.5\%} & -->
+<!-- \multicolumn{1}{c}{50\%}& -->
+<!-- \multicolumn{1}{c@{}}{97.5\%} \\ -->
+<!-- \hline -->
+<!-- {Model 0} & $\beta_0$ & $-$12.29 & 2.29 & $-$18.04 & $-$11.99 & $-$8.56 \\ -->
+<!--           & $\beta_1$  & 0.10   & 0.07 & $-$0.05  & 0.10   & 0.26  \\ -->
+<!--           & $\beta_2$   & 0.01   & 0.09 & $-$0.22  & 0.02   & 0.16  \\[6pt] -->
+<!-- {Model 1} & $\beta_0$   & $-$4.58  & 3.04 & $-$11.00 & $-$4.44  & 1.06  \\ -->
+<!--           & $\beta_1$   & 0.79   & 0.21 & 0.38   & 0.78   & 1.20  \\ -->
+<!--           & $\beta_2$   & $-$0.28  & 0.10 & $-$0.48  & $-$0.28  & $-$0.07 \\[6pt] -->
+<!-- {Model 2} & $\beta_0$   & $-$11.85 & 2.24 & $-$17.34 & $-$11.60 & $-$7.85 \\ -->
+<!--           & $\beta_1$   & 0.73   & 0.21 & 0.32   & 0.73   & 1.16  \\ -->
+<!--           & $\beta_2$   & $-$0.60  & 0.14 & $-$0.88  & $-$0.60  & $-$0.34 \\ -->
+<!--           & $\beta_3$   & 0.22   & 0.17 & $-$0.10  & 0.22   & 0.55  \\ -->
+<!-- \hline -->
+<!-- \end{tabular} -->
+<!-- % -->
+<!-- \end{table} -->
 
 
-```{r,echo=FALSE,fig.cap="Figure caption\\label{penG}"}
-plot(1:10)
-```
+<!-- ```{r,echo=FALSE,fig.cap="Figure caption\\label{penG}"} -->
+<!-- plot(1:10) -->
+<!-- ``` -->
 
-Sample of cross-reference to figure.
-Figure\ref{penG} shows that it is not easy to get something on paper.
+<!-- Sample of cross-reference to figure. -->
+<!-- Figure\ref{penG} shows that it is not easy to get something on paper. -->
 
-# Equations and the like
+<!-- # Equations and the like -->
 
-Two equations:
-\begin{equation}
-    C_{s}  =  K_{M} \frac{\mu/\mu_{x}}{1-\mu/\mu_{x}} \label{ccs}
-\end{equation}
-and
-\begin{equation}
-    G = \frac{P_{\mathrm{opt}} - P_{\mathrm{ref}}}{P_{\mathrm{ref}}}  100(\%).
-\end{equation}
+<!-- Two equations: -->
+<!-- \begin{equation} -->
+<!--     C_{s}  =  K_{M} \frac{\mu/\mu_{x}}{1-\mu/\mu_{x}} \label{ccs} -->
+<!-- \end{equation} -->
+<!-- and -->
+<!-- \begin{equation} -->
+<!--     G = \frac{P_{\mathrm{opt}} - P_{\mathrm{ref}}}{P_{\mathrm{ref}}}  100(\%). -->
+<!-- \end{equation} -->
 
-Equation arrays:
-\begin{eqnarray}
-  \frac{dS}{dt} & = & - \sigma X + s_{F} F,\\
-  \frac{dX}{dt} & = &   \mu    X,\\
-  \frac{dP}{dt} & = &   \pi    X - k_{h} P,\\
-  \frac{dV}{dt} & = &   F.
-\end{eqnarray}
-One long equation:
-\begin{eqnarray}
- \mu_{\text{normal}} & = & \mu_{x} \frac{C_{s}}{K_{x}C_{x}+C_{s}}  \nonumber\\
-                     & = & \mu_{\text{normal}} - Y_{x/s}\bigl(1-H(C_{s})\bigr)(m_{s}+\pi /Y_{p/s})\\
-                     & = & \mu_{\text{normal}}/Y_{x/s}+ H(C_{s}) (m_{s}+ \pi /Y_{p/s}).\nonumber
-\end{eqnarray}
+<!-- Equation arrays: -->
+<!-- \begin{eqnarray} -->
+<!--   \frac{dS}{dt} & = & - \sigma X + s_{F} F,\\ -->
+<!--   \frac{dX}{dt} & = &   \mu    X,\\ -->
+<!--   \frac{dP}{dt} & = &   \pi    X - k_{h} P,\\ -->
+<!--   \frac{dV}{dt} & = &   F. -->
+<!-- \end{eqnarray} -->
+<!-- One long equation: -->
+<!-- \begin{eqnarray} -->
+<!--  \mu_{\text{normal}} & = & \mu_{x} \frac{C_{s}}{K_{x}C_{x}+C_{s}}  \nonumber\\ -->
+<!--                      & = & \mu_{\text{normal}} - Y_{x/s}\bigl(1-H(C_{s})\bigr)(m_{s}+\pi /Y_{p/s})\\ -->
+<!--                      & = & \mu_{\text{normal}}/Y_{x/s}+ H(C_{s}) (m_{s}+ \pi /Y_{p/s}).\nonumber -->
+<!-- \end{eqnarray} -->
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %% Example with single Appendix:            %% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-::: {.appendix data-latex=""}
-# Title {.unnumbered #appn}
+<!-- ::: {.appendix data-latex=""} -->
+<!-- # Title {.unnumbered #appn} -->
 
-Appendices should be provided in \verb|{appendix}| environment,
-before Acknowledgements.
+<!-- Appendices should be provided in \verb|{appendix}| environment, -->
+<!-- before Acknowledgements. -->
 
-If there is only one appendix,
-then please refer to it in text as \ldots\ in the \hyperref[appn]{Appendix}.
-:::
+<!-- If there is only one appendix, -->
+<!-- then please refer to it in text as \ldots\ in the \hyperref[appn]{Appendix}. -->
+<!-- ::: -->
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %% Example with multiple Appendixes:        %% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-::: {.appendix data-latex=""}
-# Title of the first appendix {#appA}
-If there are more than one appendix, then please refer to it
-as \ldots\ in Appendix \ref{appA}, Appendix \ref{appB}, etc.
+<!-- ::: {.appendix data-latex=""} -->
+<!-- # Title of the first appendix {#appA} -->
+<!-- If there are more than one appendix, then please refer to it -->
+<!-- as \ldots\ in Appendix \ref{appA}, Appendix \ref{appB}, etc. -->
 
-# Title of the second appendix {#appB}
+<!-- # Title of the second appendix {#appB} -->
 
-## First subsection of Appendix \protect\ref{appB}
-Use the standard \LaTeX\ commands for headings in \verb|{appendix}|.
-Headings and other objects will be numbered automatically.
+<!-- ## First subsection of Appendix \protect\ref{appB} -->
+<!-- Use the standard \LaTeX\ commands for headings in \verb|{appendix}|. -->
+<!-- Headings and other objects will be numbered automatically. -->
 
-\begin{equation}
-\mathcal{P}=(j_{k,1},j_{k,2},\dots,j_{k,m(k)}). \label{path}
-\end{equation}
+<!-- \begin{equation} -->
+<!-- \mathcal{P}=(j_{k,1},j_{k,2},\dots,j_{k,m(k)}). \label{path} -->
+<!-- \end{equation} -->
 
-Sample of cross-reference to the formula (\ref{path}) in Appendix \ref{appB}.
-:::
+<!-- Sample of cross-reference to the formula (\ref{path}) in Appendix \ref{appB}. -->
+<!-- ::: -->
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %% Support information (funding), if any,   %% -->
@@ -568,15 +631,15 @@ Sample of cross-reference to the formula (\ref{path}) in Appendix \ref{appB}.
 <!-- %% Acknowledgements section.                %% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-## Acknowledgements {.unnumbered}
+<!-- ## Acknowledgements {.unnumbered} -->
 
-The authors would like to thank the anonymous referees, an Associate
-Editor and the Editor for their constructive comments that improved the
-quality of this paper.
+<!-- The authors would like to thank the anonymous referees, an Associate -->
+<!-- Editor and the Editor for their constructive comments that improved the -->
+<!-- quality of this paper. -->
 
-The first author was supported by NSF Grant DMS-??-??????.
+<!-- The first author was supported by NSF Grant DMS-??-??????. -->
 
-The second author was supported in part by NIH Grant ???????????.
+<!-- The second author was supported in part by NIH Grant ???????????. -->
 
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
@@ -585,14 +648,14 @@ The second author was supported in part by NIH Grant ???????????.
 <!-- %% with title and short description.        %% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-\begin{supplement}
-\stitle{Title of Supplement A}
-\sdescription{Short description of Supplement A.}
-\end{supplement}
-\begin{supplement}
-\stitle{Title of Supplement B}
-\sdescription{Short description of Supplement B.}
-\end{supplement}
+<!-- \begin{supplement} -->
+<!-- \stitle{Title of Supplement A} -->
+<!-- \sdescription{Short description of Supplement A.} -->
+<!-- \end{supplement} -->
+<!-- \begin{supplement} -->
+<!-- \stitle{Title of Supplement B} -->
+<!-- \sdescription{Short description of Supplement B.} -->
+<!-- \end{supplement} -->
 
 
 
