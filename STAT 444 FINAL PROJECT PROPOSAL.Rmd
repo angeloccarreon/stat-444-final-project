@@ -29,7 +29,7 @@ affiliation:
     name: Department of Statistics and Actuarial Science, University of Waterloo
     authorsLabels: e1,e2,e3,e4
 abstract: |
-  This paper contains our proposal for the STAT 444 final project. It outlines our dataset, 
+  This paper contains our proposal for the STAT 444 final project. It outlines our dataset, performs some brief exploratory data analysis, then outlines our approach to fitting regression models to predict a final sale price of a house given its physical attributes. 
 keyword-subclass: | 
  \begin{keyword}[class=MSC2020] % It must be define for aap, aop, aos journals. For aoas, sts is not used
  \kwd[Primary ]{00X00}
@@ -78,8 +78,7 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 \
 Our project aims to assess the feasibility of utilizing
 regression techniques for interpolating and modeling housing prices. From the 
-Journal of Statistics, we have selected a dataset of housing prices in Ames, 
-Iowa, along with other pertinent features. In today's dynamic real estate 
+*Journal of Statistics Education* [@cock2011amesdataset], we have selected a dataset of housing prices in Ames, Iowa, along with other pertinent features. In today's dynamic real estate 
 market, precise and dependable housing price predictions hold immense 
 significance for homeowners, buyers, and real estate professionals alike. By 
 tapping into the potential of advanced modeling techniques, our goal is to
@@ -144,26 +143,22 @@ dim(duplicates)
 summary(housing$SalePrice)
 ```
 
-```{r, echo=FALSE, fig.show='hold', fig.align='center', fig.cap="Histogram of Sale Price (top) and Log Sale Price (bottom)\\label{}"}
+```{r, echo=FALSE, fig.height=4, fig.width=8, fig.cap="Histograms of the response variable, Sale Price\\label{}"}
+par(mfrow=c(1,2), mai=c(1, 1, 1, 1))
 options(scipen=10)
-
-# Plot sale price.
 hist(housing$SalePrice, xlab = "Property Sale Price", main = "Histogram of Sale Price")
 lines(housing$SalePrice, col = 4, lwd = 2)
-par(new=TRUE)
+par(new=TRUE)   
 plot(density(housing$SalePrice), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
 
-# Plot log sale price.
 hist(log(housing$SalePrice), xlab = "log(Sale Price)", main = "Histogram of log(Sale Price)", breaks = 20)
 par(new=TRUE)   
 plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
 ```
-
-\hfill\break
 
 ## Correlations with the dependent variable
 * Based on our correlation analysis, the five numeric variables with
@@ -235,8 +230,7 @@ corrplot(topcormat, method='color', tl.cex=0.5)
 We note some non-numeric variables of interest below.
 
 \begin{itemize}
-    \item \textbf{Neighborhood.} There appears to
-be a significant difference in the average property sale price by neighborhood.
+    \item \textbf{Neighborhood.} There appears to be a significant difference in the average property sale price by neighborhood.
 \vspace{0.2cm}
 \item The dataset contains several categorical variables with low variance (i.e. near-constant), which likely hold negligible predictive power, including:
 \vspace{0.2cm}
@@ -257,11 +251,7 @@ as.data.frame(table(housing$Utilities))
 as.data.frame(table(housing$Roof.Matl))
 ```
 
-\newpage
-
 # Plan 
-\
-\
 The objective of this study is to determine the
 viability and effectiveness of employing additive models, splines, and
 polynomial regression for predicting house prices. We focus our attention on the following:
