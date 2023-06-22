@@ -191,7 +191,8 @@ final sale price of a house given its physical attributes.
 
 
 \begin{keyword}
-\kwd{We love regression}
+\kwd{housing}
+\kwd{advanced regression}
 \end{keyword}
 
 \end{frontmatter}
@@ -203,78 +204,99 @@ final sale price of a house given its physical attributes.
 \section{Introduction to our chosen
 dataset}\label{introduction-to-our-chosen-dataset}}
 
-\hfill\break
 Our project aims to assess the feasibility of utilizing regression
-techniques for interpolating and modeling housing prices. From the
-\emph{Journal of Statistics Education} \citep{cock2011amesdataset}, we
-have selected a dataset of housing prices in Ames, Iowa, along with
-other pertinent features. In today's dynamic real estate market, precise
-and dependable housing price predictions hold immense significance for
-homeowners, buyers, and real estate professionals alike. By tapping into
-the potential of advanced modeling techniques, our goal is to improve
-the accuracy and reliability of housing price predictions, contributing
-to more informed decision-making in the industry.
+techniques for interpolating and modeling housing prices. We have
+selected a dataset of housing prices in Ames, Iowa, along with their
+features from the \emph{Journal of Statistics Education}
+\citep{cock2011amesdataset}. This dataset was prepared by Dean De Cock
+for use as an end-of-semester regression project. His intent was to
+provide data of substantial size (\(n=2930\)) with easy-to-understand
+variables that are known to affect the final sale price such as build
+date, lot size, and living space square footage. Applying this to
+today's real estate market, our goal is to improve the accuracy and
+reliability of housing price predictions.
 
 \hypertarget{exploratory-data-analysis}{%
 \section{Exploratory Data Analysis}\label{exploratory-data-analysis}}
 
-\hypertarget{summary-statistics}{%
-\subsection{Summary Statistics}\label{summary-statistics}}
+This dataset contains 2930 rows and 82 columns. There are 80 explanatory
+variables, consisting of 23 nominal, 23 ordinal, 14 discrete, and 20
+continuous variables. Several columns contain many missing values and
+will be dropped before we begin fitting models. As highlighted in De
+Cock's paper, several unusual outlier house sales exist in the data;
+these will also be removed. There are no duplicate rows.
 
-\begin{itemize}
-\tightlist
-\item
-  The dataset contains 2930 rows and 82 columns.
-\item
-  There are 80 explanatory variables, including 23 nominal, 23 ordinal,
-  14 discrete, and 20 continuous variables.
-\end{itemize}
-
-\hypertarget{missingduplicate-values}{%
-\subsection{Missing/duplicate Values}\label{missingduplicate-values}}
-
-\begin{itemize}
-\tightlist
-\item
-  Four columns contain many missing values and are thus dropped, as they
-  are not critical to our analysis. \vspace{0.2cm}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Pool.QC has only 13 observations.
-  \item
-    Misc.Feature has only 106 observations.
-  \item
-    Pool.QC has only 198 observations.
-  \item
-    Fence has only 572 observations. \vspace{0.2cm}
-  \end{itemize}
-\item
-  There are no duplicate rows.
-\end{itemize}
-
-\hypertarget{distribution-of-dependent-variable}{%
-\subsection{\texorpdfstring{Distribution of dependent variable:
-\texttt{Sale Price}}{Distribution of dependent variable: }}\label{distribution-of-dependent-variable}}
-
-\begin{itemize}
-\tightlist
-\item
-  The distribution of \texttt{Sale Price} is significantly right-skewed.
-\item
-  The sale prices range from \$12,789 to \$755,000 with a mean of
-  \$180,796 and a standard deviation of \$79,886.69.
-\item
-  To achieve a more normal distribution, we can apply a log
-  transformation on the dependent variable.
-\end{itemize}
+As seen in table \ref{resp}, The distribution of \texttt{Sale\ Price} is
+significantly right-skewed. The sale prices range from \$12,789 to
+\$755,000 with a mean of \$180,796 and a standard deviation of
+\$79,886.69. To achieve a more normal distribution, we can apply a log
+transformation on the dependent variable, as seen below:
 
 \begin{figure}
 \centering
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-5-1.pdf}
-\caption{Histograms of the response variable, Sale Price\label{}}
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-3-1.pdf}
+\caption{Histograms of the response variable, Sale Price\label{resp}}
 \end{figure}
+
+\hypertarget{plan}{%
+\section{Plan}\label{plan}}
+
+The objective of this study is to determine the viability and
+effectiveness of employing additive models, splines, and polynomial
+regression for predicting house prices. We focus our attention on the
+following:
+
+\begin{itemize}
+\item
+  \textbf{Accuracy}: Assess the predictive accuracy of additive models,
+  splines, and polynomial regression in comparison to traditional
+  regression models commonly used in the real estate domain.
+    \vspace{0.2cm}
+\item
+  \textbf{Flexibility}: Analyze the ability of these techniques to
+  capture complex relationships between house price predictors, such as
+  square footage, location, number of bedrooms, and other relevant
+  features.
+  \vspace{0.2cm}
+\item
+  \textbf{Interpretability}: Evaluate the interpretability and
+  explainability of the models, ensuring that the predictions can be
+  easily understood and justified by stakeholders.
+  \vspace{0.2cm}
+\end{itemize}
+
+To achieve our objective, we propose the following methodology as an
+outline:
+
+\begin{enumerate}
+\item
+  \textbf{Initial Benchmark}: Use the performance of linear regression, with simple categorical encoding, on the full
+  feature set as an initial benchmark.
+  \vspace{0.2cm}
+\item
+  \textbf{Data Preprocessing}: Handle missing/invalid values and outliers and perform feature engineering to enhance
+  the models' predictions. To mitigate the "curse of dimensionality" and reduce collinearity in the dataset, we
+   will use a low variance filter and clustering techniques such as Principal Component Analysis (PCA).
+   \vspace{0.2cm}
+\item
+  \textbf{Model Implementation}: Develop additive models, splines, and
+  polynomial regression models using appropriate algorithms and
+  frameworks, such as generalized additive models (GAMs) and polynomial
+  regression libraries in R. We will also apply penalization techniques
+  to prevent overfitting (e.g. forward/backward selection, LASSO/Ridge regression)
+  while including interactions between covariates to model any non-linear relationships.
+  \vspace{0.2cm}
+\item
+  \textbf{Model Evaluation}: Assess the performance of the models using
+  appropriate evaluation metrics, such as mean squared error (MSE), root
+  mean squared error (RMSE), and R-squared values and compare the
+  results with benchmark models.
+  \vspace{0.2cm}
+\item
+  \textbf{Interpretation and Explainability}: Examine the contributions of each
+  feature and the underlying relationships identified by the models. Visualize the results in an intuitive yet
+  comprehensive manner.
+\end{enumerate}
 
 \hypertarget{correlations-with-the-dependent-variable}{%
 \subsection{Correlations with the dependent
@@ -328,7 +350,7 @@ variables}\label{check-if-there-is-a-high-degree-of-correlation-or-linear-associ
 
 \begin{figure}
 \centering
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-8-1.pdf}
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-6-1.pdf}
 \caption{Correlation matrix of independent variables\label{}}
 \end{figure}
 
@@ -356,70 +378,10 @@ We note some non-numeric variables of interest below.
 
 \begin{figure}
 \centering
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-7-1.pdf}
 \caption{Boxplot showing the distribution of SalePrice across
 Neighborhood\label{}}
 \end{figure}
-
-\hypertarget{plan}{%
-\section{Plan}\label{plan}}
-
-The objective of this study is to determine the viability and
-effectiveness of employing additive models, splines, and polynomial
-regression for predicting house prices. We focus our attention on the
-following:
-
-\begin{itemize}
-\item
-  \textbf{Accuracy}: Assess the predictive accuracy of additive models,
-  splines, and polynomial regression in comparison to traditional
-  regression models commonly used in the real estate domain.
-    \vspace{0.2cm}
-\item
-  \textbf{Flexibility}: Analyze the ability of these techniques to
-  capture complex relationships between house price predictors, such as
-  square footage, location, number of bedrooms, and other relevant
-  features.
-  \vspace{0.2cm}
-\item
-  \textbf{Interpretability}: Evaluate the interpretability and
-  explainability of the models, ensuring that the predictions can be
-  easily understood and justified by stakeholders.
-  \vspace{0.2cm}
-\end{itemize}
-
-To achieve our objective, we propose the following methodology as an
-outline:
-
-\begin{enumerate}
-\item
-  \textbf{Initial Benchmark}: Use the performance of linear regression, with simple categorical encoding, on the full
-  feature set as an initial benchmark.
-  \vspace{0.2cm}
-\item
-  \textbf{Data Preprocessing}: Handle missing/invalid values and outliers and perform feature engineering to enhance
-  the models' predictions. To mitigate the ``curse of dimensionality" and reduce collinearity in the dataset, we
-   will use a low variance filter and clustering techniques such as Principal Component Analysis (PCA).
-   \vspace{0.2cm}
-\item
-  \textbf{Model Implementation}: Develop additive models, splines, and
-  polynomial regression models using appropriate algorithms and
-  frameworks, such as generalized additive models (GAMs) and polynomial
-  regression libraries in R. We will also apply penalization techniques
-  to prevent overfitting (e.g. forward/backward selection, LASSO/Ridge regression)
-  while including interactions between covariates to model any non-linear relationships.
-  \vspace{0.2cm}
-\item
-  \textbf{Model Evaluation}: Assess the performance of the models using
-  appropriate evaluation metrics, such as mean squared error (MSE), root
-  mean squared error (RMSE), and R-squared values and compare the
-  results with benchmark models.
-  \vspace{0.2cm}
-\item
-  \textbf{Interpretation and Explainability}: Examine the contributions of each
-  feature and the underlying relationships identified by the models. Visualize the results in an intuitive yet
-  comprehensive manner.
-\end{enumerate}
 
 \bibliographystyle{imsart-nameyear}
 \bibliography{ims.bib}

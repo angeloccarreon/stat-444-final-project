@@ -37,8 +37,8 @@ keyword-subclass: |
  \kwd[; secondary ]{00X00}
  \end{keyword}
 keywords:
-  - We love regression
-
+  - housing
+  - advanced regression
 predefined-theoremstyle: true # use in section Environments for Axiom, Theorem, etc
 bibliography: ims.bib
 biblio-style: imsart-nameyear # alternative: imsart-number
@@ -75,26 +75,16 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 \newenvironment{kframe}{}{}
 
 # Introduction to our chosen dataset 
-\
-Our project aims to assess the feasibility of utilizing
-regression techniques for interpolating and modeling housing prices. From the 
-*Journal of Statistics Education* [@cock2011amesdataset], we have selected a dataset of housing prices in Ames, Iowa, along with other pertinent features. In today's dynamic real estate 
-market, precise and dependable housing price predictions hold immense 
-significance for homeowners, buyers, and real estate professionals alike. By 
-tapping into the potential of advanced modeling techniques, our goal is to
-improve the accuracy and reliability of housing price predictions,
-contributing to more informed decision-making in the industry.
+Our project aims to assess the feasibility of utilizing regression techniques for interpolating and modeling housing prices. We have selected a dataset of housing prices in Ames, Iowa, along with their features from the *Journal of Statistics Education* [@cock2011amesdataset]. This dataset was prepared by Dean De Cock for use as an end-of-semester regression project. His intent was to provide data of substantial size ($n=2930$) with easy-to-understand variables that are known to affect the final sale price such as build date, lot size, and living space square footage. Applying this to today's real estate market, our goal is to improve the accuracy and reliability of housing price predictions.
 
 # Exploratory Data Analysis
+
+This dataset contains 2930 rows and 82 columns. There are 80 explanatory variables, consisting of 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables. Several columns contain many missing values and will be dropped before we begin fitting models. As highlighted in De Cock's paper, several unusual outlier house sales exist in the data; these will also be removed. There are no duplicate rows.
+
+As seen in table \ref{resp}, The distribution of `Sale Price` is significantly right-skewed. The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69. To achieve a more normal distribution, we can apply a log transformation on the dependent variable, as seen below:
+
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
 housing <- read_csv("house-prices-advanced-regression-techniques/train.csv")
-```
-
-## Summary Statistics 
-* The dataset contains 2930 rows and 82 columns.
-* There are 80 explanatory variables, including 23 nominal, 23 ordinal, 14 
-discrete, and 20 continuous variables.
-```{r, echo=FALSE, results=FALSE, message=FALSE}
 nrow(housing)
 ncol(housing)
 
@@ -102,16 +92,6 @@ ncol(housing)
 housing <- housing[ , !(names(housing) == "Order")]
 ```
 
-
-## Missing/duplicate Values
-* Four columns contain many missing values and are thus dropped, as they are not critical to our analysis.
-\vspace{0.2cm}
-    + Pool.QC has only 13 observations.
-    + Misc.Feature has only 106 observations.
-    + Pool.QC has only 198 observations.
-    + Fence has only 572 observations.
-    \vspace{0.2cm}
-* There are no duplicate rows.
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
 # Alley: Type of alley access to property
 sum(!is.na(housing$Alley))      # only 198 observations
@@ -133,17 +113,7 @@ duplicates <- housing[duplicated(housing), ]
 dim(duplicates)
 ```
 
-
-
-## Distribution of dependent variable: \texttt{Sale Price}
-* The distribution of \texttt{Sale Price} is significantly right-skewed.
-* The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69.
-* To achieve a more normal distribution, we can apply a log transformation on the dependent variable.
-```{r, echo=FALSE, results=FALSE, message=FALSE}
-summary(housing$SalePrice)
-```
-
-```{r, echo=FALSE, fig.height=4, fig.width=8, fig.cap="Histograms of the response variable, Sale Price\\label{}"}
+```{r, echo=FALSE, fig.height=3, fig.width=8, fig.cap="Histograms of the response variable, Sale Price\\label{resp}"}
 par(mfrow=c(1,2), mai=c(1, 1, 1, 1))
 options(scipen=10)
 hist(housing$SalePrice, xlab = "Property Sale Price", main = "Histogram of Sale Price")
@@ -159,6 +129,62 @@ plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
 ```
+
+# Plan 
+The objective of this study is to determine the
+viability and effectiveness of employing additive models, splines, and
+polynomial regression for predicting house prices. We focus our attention on the following:
+
+\begin{itemize}
+\item
+  \textbf{Accuracy}: Assess the predictive accuracy of additive models,
+  splines, and polynomial regression in comparison to traditional
+  regression models commonly used in the real estate domain.
+    \vspace{0.2cm}
+\item
+  \textbf{Flexibility}: Analyze the ability of these techniques to
+  capture complex relationships between house price predictors, such as
+  square footage, location, number of bedrooms, and other relevant
+  features.
+  \vspace{0.2cm}
+\item
+  \textbf{Interpretability}: Evaluate the interpretability and
+  explainability of the models, ensuring that the predictions can be
+  easily understood and justified by stakeholders.
+  \vspace{0.2cm}
+\end{itemize}
+To achieve our objective, we propose the following methodology as an
+outline:
+
+\begin{enumerate}
+\item
+  \textbf{Initial Benchmark}: Use the performance of linear regression, with simple categorical encoding, on the full
+  feature set as an initial benchmark.
+  \vspace{0.2cm}
+\item
+  \textbf{Data Preprocessing}: Handle missing/invalid values and outliers and perform feature engineering to enhance
+  the models' predictions. To mitigate the "curse of dimensionality" and reduce collinearity in the dataset, we
+   will use a low variance filter and clustering techniques such as Principal Component Analysis (PCA).
+   \vspace{0.2cm}
+\item
+  \textbf{Model Implementation}: Develop additive models, splines, and
+  polynomial regression models using appropriate algorithms and
+  frameworks, such as generalized additive models (GAMs) and polynomial
+  regression libraries in R. We will also apply penalization techniques
+  to prevent overfitting (e.g. forward/backward selection, LASSO/Ridge regression)
+  while including interactions between covariates to model any non-linear relationships.
+  \vspace{0.2cm}
+\item
+  \textbf{Model Evaluation}: Assess the performance of the models using
+  appropriate evaluation metrics, such as mean squared error (MSE), root
+  mean squared error (RMSE), and R-squared values and compare the
+  results with benchmark models.
+  \vspace{0.2cm}
+\item
+  \textbf{Interpretation and Explainability}: Examine the contributions of each
+  feature and the underlying relationships identified by the models. Visualize the results in an intuitive yet
+  comprehensive manner.
+\end{enumerate}
 
 ## Correlations with the dependent variable
 * Based on our correlation analysis, the five numeric variables with
@@ -250,62 +276,6 @@ as.data.frame(table(housing$Street))
 as.data.frame(table(housing$Utilities))
 as.data.frame(table(housing$Roof.Matl))
 ```
-
-# Plan 
-The objective of this study is to determine the
-viability and effectiveness of employing additive models, splines, and
-polynomial regression for predicting house prices. We focus our attention on the following:
-
-\begin{itemize}
-\item
-  \textbf{Accuracy}: Assess the predictive accuracy of additive models,
-  splines, and polynomial regression in comparison to traditional
-  regression models commonly used in the real estate domain.
-    \vspace{0.2cm}
-\item
-  \textbf{Flexibility}: Analyze the ability of these techniques to
-  capture complex relationships between house price predictors, such as
-  square footage, location, number of bedrooms, and other relevant
-  features.
-  \vspace{0.2cm}
-\item
-  \textbf{Interpretability}: Evaluate the interpretability and
-  explainability of the models, ensuring that the predictions can be
-  easily understood and justified by stakeholders.
-  \vspace{0.2cm}
-\end{itemize}
-To achieve our objective, we propose the following methodology as an
-outline:
-
-\begin{enumerate}
-\item
-  \textbf{Initial Benchmark}: Use the performance of linear regression, with simple categorical encoding, on the full
-  feature set as an initial benchmark.
-  \vspace{0.2cm}
-\item
-  \textbf{Data Preprocessing}: Handle missing/invalid values and outliers and perform feature engineering to enhance
-  the models' predictions. To mitigate the ``curse of dimensionality" and reduce collinearity in the dataset, we
-   will use a low variance filter and clustering techniques such as Principal Component Analysis (PCA).
-   \vspace{0.2cm}
-\item
-  \textbf{Model Implementation}: Develop additive models, splines, and
-  polynomial regression models using appropriate algorithms and
-  frameworks, such as generalized additive models (GAMs) and polynomial
-  regression libraries in R. We will also apply penalization techniques
-  to prevent overfitting (e.g. forward/backward selection, LASSO/Ridge regression)
-  while including interactions between covariates to model any non-linear relationships.
-  \vspace{0.2cm}
-\item
-  \textbf{Model Evaluation}: Assess the performance of the models using
-  appropriate evaluation metrics, such as mean squared error (MSE), root
-  mean squared error (RMSE), and R-squared values and compare the
-  results with benchmark models.
-  \vspace{0.2cm}
-\item
-  \textbf{Interpretation and Explainability}: Examine the contributions of each
-  feature and the underlying relationships identified by the models. Visualize the results in an intuitive yet
-  comprehensive manner.
-\end{enumerate}
 
 <!-- \newpage -->
 <!-- \newpage -->
