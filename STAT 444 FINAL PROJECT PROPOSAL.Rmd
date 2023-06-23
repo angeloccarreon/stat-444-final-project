@@ -63,6 +63,7 @@ library(readr)
 library(kableExtra)
 library(data.table)
 library(ggplot2)
+library(gridExtra)
 
 opts_chunk$set(tidy.opts=list(width.cutoff=75))
 def.chunk.hook  <- knitr::knit_hooks$get("chunk")
@@ -121,6 +122,7 @@ lines(housing$SalePrice, col = 4, lwd = 2)
 par(new=TRUE)   
 plot(density(housing$SalePrice), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
+lines(density(log(housing$SalePrice)), col="blue")
 axis(4, las=1)
 
 hist(log(housing$SalePrice), xlab = "log(Sale Price)", main = "Histogram of log(Sale Price)", breaks = 20)
@@ -128,6 +130,37 @@ par(new=TRUE)
 plot(density(log(housing$SalePrice)), col=2, lwd = 2, yaxt="n", xaxt="n",
      bty='n', xlab="", ylab="", main='')
 axis(4, las=1)
+```
+
+Some variables of interest are `Neighbourhood` and `LotArea`, where we see in table \ref{neighbourhood} to have significant differences in the average property sale price. One way in which these neighborhoods could differ is in the size of the lots of the houses that reside there. Our team would need to consider variable associations such as these to deal with collinearity.
+
+```{r, echo=FALSE, fig.height=2, fig.width=8, fig.cap="Plots showing the distribution of final Sale Price across the different Neighborhoods\\label{neighbourhood}"}
+
+subset_housing = housing[housing$LotArea < 50000,]
+
+plot1 = ggplot(
+  subset_housing, 
+  aes(x=reorder(Neighborhood, SalePrice, FUN=median),y=SalePrice)
+) + 
+  geom_boxplot(
+    color="black", 
+    fill="yellow"
+  ) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  xlab("Neighbourhood") + 
+  ylab("Sale Price ($)")
+
+plot2 = qplot(
+  x = LotArea,
+  y = SalePrice,
+  data = subset_housing,
+  color = Neighborhood,
+  show.legend = FALSE
+) +
+  xlab("Lot Area, coloured by neighbourhood") + 
+  ylab("Sale Price ($)")
+
+grid.arrange(plot1, plot2, ncol=2)
 ```
 
 # Plan 
@@ -185,97 +218,6 @@ outline:
   feature and the underlying relationships identified by the models. Visualize the results in an intuitive yet
   comprehensive manner.
 \end{enumerate}
-
-## Correlations with the dependent variable
-* Based on our correlation analysis, the five numeric variables with
-  the highest correlations with our dependent variable are:
-  \vspace{0.2cm}
-  + Overall.Qual: Rates the overall material and finish of the house.
-  + Gr.Liv.Area: Above grade (ground) living area square feet.
-  + Garage.Cars:  Size of garage in car capacity.
-  + Garage.Area:  Size of garage in square feet.
-  + Total.Bsmt.SF: Total square feet of basement area.
-```{r, echo=FALSE, results=FALSE, message=FALSE}
-# Subset of numeric columns
-numericHousingData <- newHousing[, sapply(newHousing, is.numeric)]
-
-# Calculate the correlations between each numeric column and the response variable
-correlations <- cor(numericHousingData[, -which(names(numericHousingData) == "SalePrice")], 
-                    numericHousingData$SalePrice, use = "complete.obs")
-
-# rank the correlations into two groups (positive and negative)
-posCorrelations <- correlations[correlations[,1] >= 0, ]
-negCorrelations <- correlations[correlations[,1] < 0, ]
-
-# Print the correlations
-print(sort(posCorrelations,decreasing=TRUE))
-print(sort(negCorrelations,decreasing=FALSE))
-```
-
-
-## Check if there is a high degree of correlation or linear association among independent variables
-* Some independent variables are strongly correlated; this behavior is to be expected, as some covariates provide similar information.
-\vspace{0.2cm}
-  + For example, the high correlation between the variable **Garage Area** (size of garage in square feet) and **Garage Cars** (size of garage in car capacity) is not surprising.
-  + To address such redundant pairs, we will select one covariate from each pair, excluding the other from the analysis.
-```{r, echo=FALSE,results=FALSE, message=FALSE}
-cor_matrix <- cor(numericHousingData, use = "complete.obs")
-
-corr_df = data.frame(cor_matrix)
-corr_df$var = row.names(corr_df)
-
-# Positive
-corr_df1 = reshape2::melt(corr_df, value_name = "Corr")
-corr_df1 = corr_df1[(corr_df1$value > 0.7 & corr_df1$value < 1),]
-print(corr_df1[order(corr_df1$value,decreasing=TRUE),])
-maxpos <- corr_df1[order(corr_df1$value),]
-
-# Negative
-corr_df2 = reshape2::melt(corr_df, value_name = "Corr")
-corr_df2 = corr_df2[(corr_df2$value < -0.7 & corr_df2$value > -1),]
-print(corr_df2[order(corr_df2$value,decreasing=TRUE),])
-maxneg <- corr_df2[order(corr_df2$value),]
-
-# Correlation matrix including only the top positive and negative correlations
-names <- c(maxpos$var, maxneg$var)
-topcormat <- cor_matrix[names, names]
-```
-
-```{r, echo=FALSE, fig.cap="Correlation matrix of independent variables\\label{}"}
-# plot the correlation matrix
-# install.packages('corrplot')
-library(corrplot)
-corrplot(topcormat, method='color', tl.cex=0.5)
-```
-
-\hfill\break
-
-## Other interesting but non-numeric variables
-\
-\
-We note some non-numeric variables of interest below.
-
-\begin{itemize}
-    \item \textbf{Neighborhood.} There appears to be a significant difference in the average property sale price by neighborhood.
-\vspace{0.2cm}
-\item The dataset contains several categorical variables with low variance (i.e. near-constant), which likely hold negligible predictive power, including:
-\vspace{0.2cm}
-\begin{itemize}
-    \item \texttt{Street} - type of road access to property
-    \item \texttt{Utilities} - type of utilities available
-    \item \texttt{Roof.Matl} - roof material
-\end{itemize}
-\end{itemize}
-
-```{r, echo=FALSE, fig.cap="Boxplot showing the distribution of SalePrice across Neighborhood\\label{}"}
-ggplot(housing, aes(x=Neighborhood,y=SalePrice)) + geom_boxplot(color="black", fill="yellow")+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-```
-
-```{r, echo=FALSE,results=FALSE, message=FALSE}
-as.data.frame(table(housing$Street))
-as.data.frame(table(housing$Utilities))
-as.data.frame(table(housing$Roof.Matl))
-```
 
 <!-- \newpage -->
 <!-- \newpage -->

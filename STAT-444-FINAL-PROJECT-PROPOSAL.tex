@@ -238,6 +238,20 @@ transformation on the dependent variable, as seen below:
 \caption{Histograms of the response variable, Sale Price\label{resp}}
 \end{figure}
 
+Some variables of interest are \texttt{Neighbourhood} and
+\texttt{LotArea}, where we see in table \ref{neighbourhood} to have
+significant differences in the average property sale price. One way in
+which these neighborhoods could differ is in the size of the lots of the
+houses that reside there. Our team would need to consider variable
+associations such as these to deal with collinearity.
+
+\begin{figure}
+\centering
+\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-4-1.pdf}
+\caption{Plots showing the distribution of final Sale Price across the
+different Neighborhoods\label{neighbourhood}}
+\end{figure}
+
 \hypertarget{plan}{%
 \section{Plan}\label{plan}}
 
@@ -297,91 +311,6 @@ outline:
   feature and the underlying relationships identified by the models. Visualize the results in an intuitive yet
   comprehensive manner.
 \end{enumerate}
-
-\hypertarget{correlations-with-the-dependent-variable}{%
-\subsection{Correlations with the dependent
-variable}\label{correlations-with-the-dependent-variable}}
-
-\begin{itemize}
-\tightlist
-\item
-  Based on our correlation analysis, the five numeric variables with the
-  highest correlations with our dependent variable are: \vspace{0.2cm}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Overall.Qual: Rates the overall material and finish of the house.
-  \item
-    Gr.Liv.Area: Above grade (ground) living area square feet.
-  \item
-    Garage.Cars: Size of garage in car capacity.
-  \item
-    Garage.Area: Size of garage in square feet.
-  \item
-    Total.Bsmt.SF: Total square feet of basement area.
-  \end{itemize}
-\end{itemize}
-
-\hypertarget{check-if-there-is-a-high-degree-of-correlation-or-linear-association-among-independent-variables}{%
-\subsection{Check if there is a high degree of correlation or linear
-association among independent
-variables}\label{check-if-there-is-a-high-degree-of-correlation-or-linear-association-among-independent-variables}}
-
-\begin{itemize}
-\tightlist
-\item
-  Some independent variables are strongly correlated; this behavior is
-  to be expected, as some covariates provide similar information.
-  \vspace{0.2cm}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    For example, the high correlation between the variable
-    \textbf{Garage Area} (size of garage in square feet) and
-    \textbf{Garage Cars} (size of garage in car capacity) is not
-    surprising.
-  \item
-    To address such redundant pairs, we will select one covariate from
-    each pair, excluding the other from the analysis.
-  \end{itemize}
-\end{itemize}
-
-\begin{figure}
-\centering
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-6-1.pdf}
-\caption{Correlation matrix of independent variables\label{}}
-\end{figure}
-
-\hfill\break
-
-\hypertarget{other-interesting-but-non-numeric-variables}{%
-\subsection{Other interesting but non-numeric
-variables}\label{other-interesting-but-non-numeric-variables}}
-
-\hfill\break
-\hfill\break
-We note some non-numeric variables of interest below.
-
-\begin{itemize}
-    \item \textbf{Neighborhood.} There appears to be a significant difference in the average property sale price by neighborhood.
-\vspace{0.2cm}
-\item The dataset contains several categorical variables with low variance (i.e. near-constant), which likely hold negligible predictive power, including:
-\vspace{0.2cm}
-\begin{itemize}
-    \item \texttt{Street} - type of road access to property
-    \item \texttt{Utilities} - type of utilities available
-    \item \texttt{Roof.Matl} - roof material
-\end{itemize}
-\end{itemize}
-
-\begin{figure}
-\centering
-\includegraphics{STAT-444-FINAL-PROJECT-PROPOSAL_files/figure-latex/unnamed-chunk-7-1.pdf}
-\caption{Boxplot showing the distribution of SalePrice across
-Neighborhood\label{}}
-\end{figure}
 
 \bibliographystyle{imsart-nameyear}
 \bibliography{ims.bib}
