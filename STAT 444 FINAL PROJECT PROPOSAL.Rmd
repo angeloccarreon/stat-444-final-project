@@ -76,7 +76,7 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 \newenvironment{kframe}{}{}
 
 # Introduction to our chosen dataset 
-Our project aims to assess the feasibility of utilizing regression techniques for interpolating and modeling housing prices. We have selected a dataset of housing prices in Ames, Iowa, along with their features from the *Journal of Statistics Education* [@cock2011amesdataset]. This dataset was prepared by Dean De Cock for use as an end-of-semester regression project. His intent was to provide data of substantial size ($n=2930$) with easy-to-understand variables that are known to affect the final sale price such as build date, lot size, and living space square footage. Applying this to today's real estate market, our goal is to improve the accuracy and reliability of housing price predictions.
+Our project aims to assess the feasibility of utilizing regression techniques for interpolating and modeling housing prices. We have selected a dataset of housing prices in Ames, Iowa, along with their features from the *Journal of Statistics Education* [@cock2011amesdataset]. This dataset was prepared by Dean De Cock for use as an end-of-semester regression project. His intent was to provide data of substantial size ($n=2930$) with easy-to-understand variables that are known to affect the final sale price such as build date, lot size, and living space square footage. Applying this to today's real estate market, we wish to answer the following question: *which regression method best predicts the prices of houses given their characteristics*?
 
 # Exploratory Data Analysis
 

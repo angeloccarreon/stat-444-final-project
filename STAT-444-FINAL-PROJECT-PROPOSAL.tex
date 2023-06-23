@@ -213,8 +213,9 @@ for use as an end-of-semester regression project. His intent was to
 provide data of substantial size (\(n=2930\)) with easy-to-understand
 variables that are known to affect the final sale price such as build
 date, lot size, and living space square footage. Applying this to
-today's real estate market, our goal is to improve the accuracy and
-reliability of housing price predictions.
+today's real estate market, we wish to answer the following question:
+\emph{which regression method best predicts the prices of houses given
+their characteristics}?
 
 \hypertarget{exploratory-data-analysis}{%
 \section{Exploratory Data Analysis}\label{exploratory-data-analysis}}
@@ -226,7 +227,7 @@ will be dropped before we begin fitting models. As highlighted in De
 Cock's paper, several unusual outlier house sales exist in the data;
 these will also be removed. There are no duplicate rows.
 
-As seen in table \ref{resp}, The distribution of \texttt{Sale\ Price} is
+As seen in table \ref{resp}, the distribution of \texttt{Sale\ Price} is
 significantly right-skewed. The sale prices range from \$12,789 to
 \$755,000 with a mean of \$180,796 and a standard deviation of
 \$79,886.69. To achieve a more normal distribution, we can apply a log
