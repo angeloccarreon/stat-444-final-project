@@ -82,7 +82,7 @@ Our project aims to assess the feasibility of utilizing regression techniques fo
 
 This dataset contains 2930 rows and 82 columns. There are 80 explanatory variables, consisting of 23 nominal, 23 ordinal, 14 discrete, and 20 continuous variables. Several columns contain many missing values and will be dropped before we begin fitting models. As highlighted in De Cock's paper, several unusual outlier house sales exist in the data; these will also be removed. There are no duplicate rows.
 
-As seen in table \ref{resp}, The distribution of `Sale Price` is significantly right-skewed. The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69. To achieve a more normal distribution, we can apply a log transformation on the dependent variable, as seen below:
+As seen in table \ref{resp}, the distribution of `Sale Price` is significantly right-skewed. The sale prices range from \$12,789 to \$755,000 with a mean of \$180,796 and a standard deviation of \$79,886.69. To achieve a more normal distribution, we can apply a log transformation on the dependent variable, as seen below:
 
 ```{r, echo=FALSE, results=FALSE, message=FALSE}
 housing <- read_csv("house-prices-advanced-regression-techniques/train.csv")
@@ -148,7 +148,8 @@ plot1 = ggplot(
   ) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   xlab("Neighbourhood") + 
-  ylab("Sale Price ($)")
+  ylab("Sale Price ($)") +
+  ylim(0, 400000)
 
 plot2 = qplot(
   x = LotArea,
