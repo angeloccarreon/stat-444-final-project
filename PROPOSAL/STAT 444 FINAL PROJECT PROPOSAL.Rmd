@@ -159,7 +159,9 @@ plot2 = qplot(
   show.legend = FALSE
 ) +
   xlab("Lot Area, coloured by neighbourhood") + 
-  ylab("Sale Price ($)")
+  ylab("Sale Price ($)") +
+  xlim(0, 20000) +
+  ylim(0, 500000)
 
 grid.arrange(plot1, plot2, ncol=2)
 ```

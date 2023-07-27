@@ -1,0 +1,115 @@
+---
+title: "Group Project Report"
+output: html_document
+date: "2023-07-21"
+---
+
+```{r setup, include=FALSE}
+library(MASS)
+library(dplyr)
+# setwd("C:/Users/joych/OneDrive/Desktop")
+# setwd("C:/Users/Angelo/OneDrive - University of Waterloo/School/University/Year 4/4B/STAT 444/Final Project/STAT 444 FINAL PROJECT PROPOSAL/MODEL FITTING")
+housing <- read.csv(file="house-prices-advanced-regression-techniques/train.csv")
+```
+
+
+```{r Data Cleaning}
+################################################## Drop Irrelevant Columns #################################################
+# several categorical variables with low variance (i.e. near-constant), which likely hold negligible predictive power
+as.data.frame(table(housing$Street))
+as.data.frame(table(housing$Utilities))
+as.data.frame(table(housing$Roof.Matl))
+as.data.frame(table(housing$MiscFeature))
+
+# compute the percentage of NAs in each column
+percentage_missing <- colMeans(is.na(housing)) * 100
+
+# dropping columns with > 80% missing values
+drop <- c("Id", "Street", "Utilities", "Roof.Matl", "MiscFeature", "Alley", "PoolQC", "Fence")
+
+# drop these columns
+housing <- housing[,!(names(housing) %in% drop)]
+
+
+################################################### Outlier Removal #######################################################
+
+# Calculate the mean and standard deviation of the target column
+mean_value <- mean(housing$SalePrice, na.rm = TRUE)
+sd_value <- sd(housing$SalePrice, na.rm = TRUE)
+
+# Remove rows where the column value is below or above the 3-standard deviation threshold
+filtered_data <- housing %>%
+      filter(SalePrice >= mean_value - 3 * sd_value,
+             SalePrice <= mean_value + 3 * sd_value)
+
+```
+
+```{r}
+################################################## Highly Correlated Variables Removal ###########################################
+# selecting only numeric columns in the dataset
+nums <- unlist(lapply(filtered_data, is.numeric), use.names = FALSE)  
+num_cols <- housing[ , nums]
+
+# correlaiton matrix
+cor_matrix <- cor(num_cols, method='pearson', use='pairwise.complete.obs')
+diag(cor_matrix) <- 0
+
+cor_threshold <- 0.8
+
+# Create a vector to keep track of the selected features
+selected_features <- character(0)
+
+# Identify and keep one representative from each group of highly correlated features
+for (i in 1:(ncol(cor_matrix) - 1)) {
+  if (!(colnames(cor_matrix)[i] %in% selected_features)) {
+    highly_correlated <- colnames(cor_matrix)[cor_matrix[, i] >= cor_threshold]
+    selected_features <- c(selected_features, highly_correlated[1])
+  }
+}
+selected_features <- selected_features[!is.na(selected_features)]
+# Select the columns corresponding to the selected features from the original data
+selected_data <- housing[, !(names(housing) %in% selected_features)]
+
+```
+
+
+```{r}
+################################################ Missing Value Imputation (With Mean) ###############################################
+# selecting only numeric columns in the dataset
+nums <- unlist(lapply(selected_data, is.numeric), use.names = FALSE)  
+num_cols <- selected_data[ , nums]
+
+# Mean imputation
+# Calculate column means (excluding NA values)
+column_means <- colMeans(num_cols, na.rm = TRUE)
+# Replace missing values with the corresponding column mean
+imputed_data <- num_cols
+for (col in 1:ncol(imputed_data)) {
+ imputed_data[is.na(imputed_data[, col]), col] <- column_means[col]
+}
+
+############################################## Forward/Backward Selection ############################################################
+full.model <- lm(SalePrice ~ ., data = imputed_data)
+# Stepwise regression model (optimizing AIC?) (from 33 variables to 19)
+step.model <- stepAIC(full.model, direction = "both", 
+                      trace = FALSE)
+summary(step.model)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r extra code}
+# compute the correlation matrix with the target variable
+corTargetMatrix <- cor(num_cols, method='pearson')[,'SalePrice']
+corTargetMatrix <- corTargetMatrix[!is.na(corTargetMatrix)]
+
+# is 19 a good number?
+n <- 20
+# Select the top 19 (half of the original column number) by sorting correlation numbers
+topCorMatrix <- corTargetMatrix[sort(abs(corTargetMatrix), decreasing=T,index.return=T)[[2]][1:n]]
+
+# get all the categorical columns
+factorCols <- housing[which(sapply(housing, function(x) {length(unique(x)) < 30}))]
+nonNums <- unlist(lapply(factorCols, Negate(is.numeric)), use.names = FALSE)  
+catCols <- factorCols[ , nonNums]
+```
