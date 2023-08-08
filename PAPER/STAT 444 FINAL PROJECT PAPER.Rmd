@@ -1,0 +1,413 @@
+---
+title: STAT 444 FINAL PROJECT PAPER
+runtitle: 
+author:
+  - name: Angelo 
+    surname: Carreon
+    email: jaccarre@uwaterloo.ca
+    label: e1, mark
+    addressLabel: A
+affiliation:
+  - label: A
+    name: Department of Statistics and Actuarial Science, University of Waterloo
+    authorsLabels: e1
+abstract: |
+  This paper answers the question: which regression method best predicts the prices of houses given their characteristics? To do this, four different regression techniques were fitted to the Ames Housing dataset, a popular collection of house sales that was prepared for an end-of-semseter regression project. This dataset was processed to address missing values, perform dimensionality reduction, and remove outliers. A multiple linear regression, ridge regression, lasso regression, and generalized additive model were then fitted to this processed data and their root mean squared errors were compared using cross-validation. It was found that a Generalized Additive model best fit the data, due to the non-linear relationships present in the covariates.
+keyword-subclass: | 
+ \begin{keyword}[class=MSC2020] % It must be define for aap, aop, aos journals. For aoas, sts is not used
+ \kwd[Primary ]{00X00}
+ \kwd{00X00}
+ \kwd[; secondary ]{00X00}
+ \end{keyword}
+keywords:
+  - housing
+  - advanced regression
+predefined-theoremstyle: true # use in section Environments for Axiom, Theorem, etc
+bibliography: ims.bib
+biblio-style: imsart-nameyear # alternative: imsart-number
+output:
+  rticles::ims_article:
+    journal: aoas # aap, aoas, aop, aos, sts. See documentation
+    toc: false # Please use for articles with 50 pages and more
+header-includes:
+- \usepackage{listings}
+- \usepackage{xcolor}
+- \usepackage{float}
+- \floatplacement{figure}{H}
+editor_options: 
+  markdown: 
+    wrap: 80
+---
+
+```{r setup, echo=FALSE, results=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+library(knitr)
+library(readr)
+library(kableExtra)
+library(data.table)
+library(ggplot2)
+library(gridExtra)
+library(ICglm)
+library(splines)
+library(mgcv)
+library(glmnet)
+library(scales)
+
+opts_chunk$set(tidy.opts=list(width.cutoff=75))
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
+setwd("C:/Users/Angelo/OneDrive - University of Waterloo/School/University/Year 4/4B/STAT 444/Final Project/STAT 444 FINAL PROJECT/PAPER")
+```
+
+\newenvironment{kframe}{}{}
+
+# Introduction to our chosen dataset
+
+Our project aims to assess the feasibility of utilizing regression techniques
+for interpolating and modeling housing prices. We have selected a dataset of
+housing prices in Ames, Iowa, along with their features from the *Journal of
+Statistics Education* [@cock2011amesdataset,]. This dataset was prepared by Dean
+De Cock for use as an end-of-semester regression project. His intent was to
+provide data of substantial size ($n=2930$) with easy-to-understand variables
+that are known to affect the final sale price such as build date, lot size, and
+living space square footage. Applying this to today's real estate market, we
+wish to answer the following question: *which regression method best predicts
+the prices of houses given their characteristics*?
+
+# Exploratory Data Analysis
+
+This dataset contains 2930 rows and 80 columns. There are 80 explanatory
+variables, consisting of 23 nominal, 23 ordinal, 14 discrete, and 20 continuous
+variables. Several columns contain many missing values and will be dropped
+before we begin fitting models. As highlighted in De Cock's paper, several
+unusual outlier house sales exist in the data; these will also be removed. There
+are no duplicate rows.
+
+As seen in figure \ref{resp}, the distribution of `Sale Price` is significantly
+right-skewed. The sale prices range from \$12,789 to \$755,000 with a mean of
+\$180,796 and a standard deviation of \$79,886.69. To achieve a more normal
+distribution, we can apply a log transformation on the dependent variable, as
+seen below:
+
+```{r, echo=FALSE, results=FALSE, message=FALSE}
+housing <- read.csv("data/AmesHousing.csv")
+
+# remove column Order and PID since it's just row index
+housing <- housing[ , !(names(housing) == "Order")]
+housing <- housing[ , !(names(housing) == "PID")]
+
+# Row and Column Counts
+nrow(housing)
+ncol(housing)
+```
+
+```{r, echo=FALSE, results=FALSE, message=FALSE}
+# Alley: Type of alley access to property
+sum(!is.na(housing$Alley))      # only 198 observations
+# Pool.QC: Pool quality
+sum(!is.na(housing$Pool.QC))    # only 13 observations
+# Misc.Feature: Miscellaneous feature not covered in other categories
+sum(!is.na(housing$Misc.Feature)) # only 106 observations
+# Fence: Fence quality
+sum(!is.na(housing$Fence))  # only 572 observations
+# Fireplace.Qu: Fireplace quality
+sum(!is.na(housing$Fireplace.Qu)) # only 1508 observations
+
+# remove column alley, pool QC, Misc Feature
+drops <- c("Alley","Pool.QC", "Fence", "Misc.Feature")
+newHousing <- housing[ , !(names(housing) %in% drops)]
+
+# Check for duplicates in the entire dataset (0 duplicates)
+duplicates <- housing[duplicated(housing), ]
+dim(duplicates)
+```
+
+```{r, echo=FALSE, fig.height=2.5, fig.width=8, fig.cap="Histograms of the response variable, Sale Price\\label{resp}", out.extra='trim={0 1cm 0 1cm},clip'}
+par(mfrow=c(1,2), mai=c(1, 1, 1, 1))
+options(scipen=10)
+hist(housing$SalePrice, xlab = "Property Sale Price", main = "Histogram of Sale Price")
+axis(4, las=1)
+
+hist(log(housing$SalePrice), xlab = "log(Sale Price)", main = "Histogram of log(Sale Price)", breaks = 20)
+axis(4, las=1)
+```
+
+Some variables of interest are `Neighbourhood` and `Lot.Area`, where we see in
+figure \ref{neighbourhood} to have significant differences in the average
+property sale price. One way in which these neighborhoods could differ is in the
+size of the lots of the houses that reside there. Our team would need to
+consider variable associations such as these to deal with collinearity.
+
+```{r, echo=FALSE, fig.height=1.8, fig.width=8, fig.cap="Plots showing the distribution of final Sale Price across the different Neighborhoods\\label{neighbourhood}"}
+
+subset_housing = housing[housing$Lot.Area < 50000,]
+
+plot1 = ggplot(
+  subset_housing, 
+  aes(x=reorder(Neighborhood, SalePrice, FUN=median),y=SalePrice)
+) + 
+  geom_boxplot(
+    color="black", 
+    fill="yellow"
+  ) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  xlab("Neighbourhood") + 
+  ylab("Sale Price ($)") +
+  ylim(0, 400000)
+
+plot2 = qplot(
+  x = Lot.Area,
+  y = SalePrice,
+  data = subset_housing,
+  color = Neighborhood,
+  show.legend = FALSE
+) +
+  xlab("Lot Area, coloured by neighbourhood") + 
+  ylab("Sale Price ($)") +
+  xlim(0, 20000) +
+  ylim(0, 500000)
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+# Methods
+
+There were three steps in the process of determining the most effective regression model for predicting house prices: data preprocessing, model fitting, and cross-validation. Preprocessing was used to clean the data, upon which models were fitted and evaluated against each other using a cross-validation scheme. 
+
+## Data Preprocessing and Dimensionality Reduction
+
+Below is the pipeline we used to process the data:
+
+![Ames Housing data processing
+pipeline](images/EDA_PREPROCESSING.png){width="500"}
+
+- First, we did some feature engineering in order to differentiate the `Year.Built` and `Year.Remodeled` covariates. We replaced the `Year.Remodeled` covariate with the difference in years between renovation and construction, so that the rest of our processing steps can correctly differentiate between these two covariates.
+
+- Then, we addressed missing values in the data by removing covariates that had majority null values. A nearest neighbor algorithm was used on the remaining covariates to impute the remaining missing values.
+
+- Next, we employed dimensionality reduction, reducing the number of covariates to 19. 
+  - For categorical variables, we selected the top 10 that had the highest information gain. The specific calculation of this score is defined in @quinlaninduction. In summary, information gain measures the reduction in uncertainty about the target variable when the data is split based on a specific feature, helping decision tree algorithms identify the most valuable features for prediction.
+  - For numeric variables, one covariate from each group of highly correlated features was kept, and any covariates that showed weak linear relationships were removed.
+
+- In order for our models to correctly interpret the categorical variables, their levels were factorized and converted into numeric values. Some categorical variables were ratings ranging from poor $\to$ excellent. These were converted to ordinal covariates, whose values increase as the rating increases.
+
+- Lastly, to address outliers, we removed any observations that had a covariate whose values lie more than 3 standard deviations from the mean.
+
+After the data preprocessing step, we were left with $19$ covariates: $5$ nominal, $5$ ordinal, $5$ discrete, and $4$ continuous. Before any models were fit, the data was partitioned into training and testing splits at an 80:20 ratio.
+
+## Model Fitting
+
+Four regression techniques were compared in our analysis: Multiple Linear Regression, Ridge Regression, Lasso Regression, and a Generalized Additive Model. 
+
+- The MLR model was fit using R's built-in `lm` object, which solves Ordinary Least Squares:
+
+$$
+\min_{\beta} \sum_{i=1}^N(y_i - \beta_0 - \sum_{j=1}^px_{ij}\beta_j)^2
+$$
+
+- Both the Ridge and Lasso regression models were fit using the `glmnet` package, which uses cyclical coordinate descent to efficiently solve
+
+$$
+\min_{\beta}\frac{1}{2N}\sum_{i=1}^N(y_i-x_i^T\beta)^2 + \lambda[(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1]
+$$
+
+where $0 \leq \alpha \leq 1$ is the elastic net penalty and $\lambda \geq 0$ controls its strength [@JSSv033i01,]. $\alpha=0$ was used to obtain a ridge penalty, and $\alpha=1$ was used to obtain lasso penalty. For both ridge and lasso regression, the optimal $\lambda$ value was chosen to minimize mean-squared error via grid search under a 10-fold cross-validation scheme. An example of the output of the hyperparameter fit of $\lambda$ for both ridge and lasso regression using the training set is below:
+
+```{r, echo=FALSE}
+train_set = read.csv("data/train_set.csv")
+test_set = read.csv("data/test_set.csv")
+
+# Create matrices for linear regression functions
+X <- as.matrix(train_set, ncol=20)[,-20]
+Y <- as.matrix(train_set, ncol=20)[,20]
+
+model.lasso <- cv.glmnet(X, Y, type.measure = "mse", alpha=1)
+model.ridge <- cv.glmnet(X, Y, type.measure = "mse", alpha=0)
+
+glmnet_summary = rbind(
+  Lasso = c(0.001382, 60, 0.02186, 0.002074),
+  Ridge = c(0.03345, 100, 0.02213, 0.001429)
+)
+
+colnames(glmnet_summary) = c("Selected Lambda", "Index", "MSE", "SE")
+
+kable(
+  glmnet_summary, 
+  format = "latex", 
+  caption = "Sample output of lambda that minimizes MSE under Cross Validation",
+  vline = "", 
+  linesep = "") %>%
+  kable_styling(latex_options = c("HOLD_position")
+)
+```
+
+- A GAM was fitted using `mgcv`. A smooth was created for each covariate using the default *thin plate regression spline*, which minimize
+
+$$
+||y-f||^2 + \lambda J_{md}(f)
+$$
+
+where $y$ is the vector of $y_i$ data, $f = (f(x_1), f(x_2), \dots, f(x_n))$, $J_{md}(f)$ is a penalty function that measures the "wiggliness" of $f$, and $\lambda$ is the hyperparameter that controls the trade-off between data fitting and smoothness of $f$. The "wiggliness" penalty is defined in @thinplateregressionsplines.
+
+Smooths for continuous covariates were generated automatically, but categorical/ordinal variables required $k$ (the dimension of the basis used to represent the smooth term) to be explicitly set to the number of categories in the covariate. This was required since the categorical variables often had unique values less than the default degrees of freedom $k=10$ set by `mgcv`, and attempting to construct the smooth would result in an error. 
+
+As seen in figure \ref{smooths}, ordinality is captured fairly well by the smooths (usually trends upwards), but unordered categorical variables such as `Neighborhood` must be interpreted with caution, as the trends in the smooth are essentially meaningless - we are only interested in the predicted value at a specific neighbourhood.
+
+## Cross-validation
+
+These models were assessed using a 20-fold cross-validation scheme, and the primary metric used to compare the different models was RMSE:
+
+$$
+CV(\hat f) = \frac{1}{N} \sum_{i=1}^N L\left(y_i, \hat f^{-k(i)}(x_i) \right) \text{, where } L=RMSE = \sqrt{\sum_{i=1}^n \frac{(\hat y_i - y_i)^2}{n}}
+$$
+
+defined in @hastie01statisticallearning. This metric was chosen due to its interpretability, and due to the fact that the number of covariates were preprocessed at the beginning rather than during each fold. The reason for this decision was because we were unable to develop a way to run the data preprocessing steps within each fold, as creating the GAM model with custom combinations of smooths proved difficult. This meant that metrics such as AIC, $R^2$, etc. were not needed to generate and evaluate bias-variance trade-off under different combinations of covariates; we were only interested in the raw predictive power of traditional linear regressions vs. additive models on the final subset of covariates in the preprocessed data. Hence, RMSE was used to evaluate how close a model's prediction was to the actual value.
+
+# Results
+
+## Final fitted models
+
+The Cross Validation and Test RMSEs for the models are below:
+
+```{r, echo=FALSE}
+rmse_summary = rbind(
+  MLR = c(0.1483174, 0.2160399),
+  Lasso = c(0.1537585, 0.2106195),
+  Ridge = c(0.155426, 0.2105215),
+  GAM = c(0.1426394, 0.1803288)
+)
+
+colnames(rmse_summary) = c("Average Cross-Validation RMSE", "Test RMSE")
+
+kable(
+  rmse_summary, 
+  format = "latex", 
+  caption = "RMSEs for the fitted models",
+  vline = "", 
+  linesep = ""
+) %>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+We observe that the CV RMSE appears to be substantially lower than the testing RMSE. In ESL section 7.10.2, Hastie explains that our method of preprocessing the data and then fitting the models results in information leak, as the subset of predictors were chosen on the basis of *all of the samples* [@hastie01statisticallearning,]. Hastie goes on to say lots of high ranking journals make this same mistake, so at least we have something in common! In the end, CV scores seemed to be fairly representative of the test scores, and we can attribute any differences in generalization error to the information leak.
+
+**In the end, the GAM approach outperformed the traditional linear regression methods in both CV and Test scores, so it was chosen as the final fitted model**. To understand why, we examine the generated plots of the smooths:
+
+```{r, echo=FALSE, results=FALSE}
+# Plot the GAM smooths
+formula <- SalePrice ~
+  s(Neighborhood, k=length(unique(train_set$Neighborhood))) +
+  s(House.Style, k=length(unique(train_set$House.Style))) +
+  s(Overall.Qual, k=length(unique(train_set$Overall.Qual))) +
+  s(Year.Built) +
+  s(Exterior.1st, k=length(unique(train_set$Exterior.1st))) +
+  s(Exterior.2nd, k=length(unique(train_set$Exterior.2nd))) +
+  s(Mas.Vnr.Area) +
+  s(Foundation, k=length(unique(train_set$Foundation))) +
+  s(Bsmt.Qual, k=length(unique(train_set$Bsmt.Qual))) +
+  s(BsmtFin.Type.1, k=length(unique(train_set$BsmtFin.Type.1))) +
+  s(BsmtFin.SF.1) +
+  s(Total.Bsmt.SF) +
+  s(Gr.Liv.Area) +
+  s(Full.Bath, k=length(unique(train_set$Full.Bath))) +
+  s(Kitchen.Qual, k=length(unique(train_set$Kitchen.Qual))) +
+  s(Fireplaces, k=length(unique(train_set$Fireplaces))) +
+  s(Fireplace.Qu, k=length(unique(train_set$Fireplace.Qu))) +
+  s(Garage.Finish, k=length(unique(train_set$Garage.Finish))) +
+  s(Garage.Cars, k=length(unique(train_set$Garage.Cars)))
+
+gam_model = gam(formula, data=train_set)
+```
+
+```{r, echo=FALSE, fig.height=9, fig.width=15, fig.cap="Selected smooths plotted against residuals. Row 1 displays continuous covariates, row 2 displays ordinal/discrete covariates, and row 3 displays categorical covariates.\\label{smooths}"}
+par(mfrow=c(3, 5))
+
+# Continuous covariates + Year Built (discrete)
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice), 
+      pch=1, cex=0.75, cex.lab=1.5, select=4, xlab="Year Built", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Year.Built, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice), 
+      pch=1, cex=0.75, cex.lab=1.5, select=11, xlab="Finished Basement Square Ft", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ BsmtFin.SF.1, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice), 
+      pch=1, cex=0.75, cex.lab=1.5, select=12, xlab="Total Basement Square Ft", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Total.Bsmt.SF, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice), 
+      pch=1, cex=0.75, cex.lab=1.5, select=13, xlab="Above Ground Living Area Square Ft", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Gr.Liv.Area, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice), 
+      pch=1, cex=0.75, cex.lab=1.5, select=7, xlab="Masonry Veneer Area", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Mas.Vnr.Area, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+
+# Ordinal Covariates
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=3, xlab="Overall Quality (1-10)", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Overall.Qual, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=10, xlab="Finished Basement Rating (Poor -> Excellent)", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Bsmt.Qual, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=15, xlab="Kitchen Quality (Poor -> Excellent)", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Kitchen.Qual, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=16, xlab="# of Fireplaces", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Fireplaces, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=19, xlab="Size of garage in car capacity", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Garage.Cars, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+
+# Categorical Covariates
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=1, xlab="Neighborhood", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Neighborhood, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=2, xlab="House Style", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ House.Style, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=5, xlab="Exterior Type", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Exterior.1st, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+plot(gam_model, trans=exp, shift=mean(train_set$SalePrice),  
+      pch=1, cex=0.75, cex.lab=1.5, select=8, xlab="Foundation Type", ylab="Sale Price ($)")
+points(exp(SalePrice) ~ Foundation, data=train_set,cex=0.75,col=alpha('grey', 0.5))
+```
+
+We clearly see that there are lots of non-linear trends in several continuous and ordinal covariates that the GAM handles gracefully. This is likely why the GAM outperformed the linear regression models, and best predicted the prices of houses given their characteristics. Since Lasso, Ridge, and MLR require that the predictors are linear in order to perform the best, they struggle to fit the least-squares solutions and see higher RMSE scores. Moreover, Lasso and Ridge approaches only serve to deal with multicollinearity, not nonlinearity. Ridge shrinks correlated predictors towards each other, whereas Lasso selects one correlated predictor and ignores the rest [@JSSv033i01,]. Since most of the multicollinearity was addressed in the data preprocessing step, it makes sense that the MLR, Ridge, and Lasso RMSEs are close to one another.
+
+## Model Assumptions
+
+The following graphs depict the performance of the final model on the testing set, fitted using the training set.
+
+```{r, echo=FALSE, results=FALSE, fig.height=2, fig.width=8, fig.cap="Residual QQ-plot, Residual histogram, and Fitted Values vs. Residuals plot\\label{assumptions}", out.extra='trim={0 0.4cm 0 0.2cm},clip'}
+# Check assumptions of GAM
+par(mfrow=c(1, 4))
+
+resid <- residuals(gam_model)
+linpred <- napredict(gam_model$na.action, gam_model$linear.predictors)
+observed.y <- napredict(gam_model$na.action, gam_model$y)
+
+# QQ plot
+qq.gam(gam_model, main="Residuals QQ-plot")
+
+# Fitted values vs. residuals
+plot(linpred, resid, main = "Fitted Values vs. Residuals", xlab = "Fitted Values", ylab = "residuals")
+
+# Histogram of residuals
+hist(resid, xlab = "Residuals", main = "Histogram of residuals")
+
+# Response vs. Fitted Values
+plot(fitted(gam_model), observed.y, xlab = "Fitted Values", 
+     ylab = "Response", main = "Response vs. Fitted Values", pch=20)
+```
+
+We can see that the normality assumption appears to be violated, as the tails on the left side of the QQ-plot appear to be quite heavy. Taking a look at the histogram of residuals, we can see that the model appears to be undershooting sale prices when the true value is large. This may be the result of the GAM function smoothing away the wiggliness that might be required at the tail ends of the sale price values, or outliers in the data that our preprocessing steps failed to recognize. Thus we have to be careful when the predicted values lie in the range of the tails of the sale price values, since we can visually see that there are large amounts of error at these regions.
+
+# Conclusions
+
+In conclusion, we find that a generalized additive model produced the best predictions of house sale prices given its physical characteristics, with a RMSE of $\$26338.29$, which is acceptable given the sale price ranges from $\$12,789$ to $\$755,000$ with mean $\$180,796$ and standard deviation $\$79,886.69$. This model was able to correctly capture the non-linearity in the data, and consistently produce predictions with the lowest RMSE score in both the cross-validation and testing scenarios. Although there was evidence of information leak due to the data preprocessing being done before cross-validation, the GAM still outperformed traditional regression methods in the test scenario.
+
+One limitation of this analysis was that, in retrospect, of course the GAM would fit non-linear data better than the linear regression models. However, the benefit of using a GAM is that much less time and effort was required to preprocess the data. While are many ways to transform the covariates such that they are linear with the response and produce better predicted values under linear models, these methods can be computationally intensive and sacrifice interpretability. Simply fitting a GAM allowed a group of undergraduate students to quickly generate accurate predictions without worrying too much about the usual linear regression assumptions.
+
+Therefore, given the limited resources our group had to generate these regression models, the GAM was the best choice for quickly producing accurate predictions. In the future, it would be worthwhile to compare a GAM against linear models that better address the nonlinearity, to make a more fair comparison. It would also be interesting to see how this model performs on a more recent dataset, as these housing prices are quite low for today's standards.

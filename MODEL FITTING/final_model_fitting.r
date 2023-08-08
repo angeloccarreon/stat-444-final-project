@@ -1,13 +1,23 @@
+# Working Directory
+setwd("C:/Users/Angelo/OneDrive - University of Waterloo/School/University/Year 4/4B/STAT 444/Final Project/STAT 444 FINAL PROJECT/MODEL FITTING")
+
+# Imports
+library(CORElearn)
+library(plyr)
+library(ICglm)
+library(splines)
+library(mgcv)
+library(glmnet)
+
 # Read the data
 data <- read.csv('house-prices-advanced-regression-techniques/AmesHousing.csv')
-housing_raw = read.csv('house-prices-advanced-regression-techniques/AmesHousing.csv')
 
 # Set the seed for any random ops
 set.seed(69420)
 
 ################################################################################
 # nn_val: Helper function to get nearest neighbor value for a query variable.
-# Uses a random sample of the data frame to fill in the NA value at 
+# Uses a random sample of the data frame to fill in the NA value at
 # data[query_row_idx, query_var].
 
 # Inputs:
@@ -24,14 +34,14 @@ set.seed(69420)
 nn_val <- function(data, query_row_idx, query_var, cat_var, neighborhood=10) {
   # In case the nearest neighbors algorithm returns NA.
   backup_val <- mode(data[,query_var])
-  
+
   # Select a small random sample of data to act as neighbors
   data <- data[sample(nrow(data), neighborhood),]
-  
+
   # Extract query row and remove it from the dataset
   query_row <- data[query_row_idx,]
   other_data <- data[-query_row_idx,]
-  
+
   # Compute distance scores between the query and each neighbor
   distances <- sapply(seq(nrow(other_data)), function(idx) {
     other <- other_data[idx,]
@@ -61,7 +71,7 @@ nn_val <- function(data, query_row_idx, query_var, cat_var, neighborhood=10) {
     }))
     return(score)
   })
-  
+
   # The nearest neighbor is the one with the lowest distance score.
   nearest_neighbor <- sample(which(distances==min(distances)), 1)
   pred <- data[nearest_neighbor, query_var]
@@ -104,16 +114,13 @@ apply_util_to_df <- function(df, util_func) {
 # -> min_var: A number specifying the cutoff for low variance filter (ignore for
 # now).
 
-# Imports
-library(CORElearn)
-
 preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
   # Removing some covariates by inspection:
   # -> "Order"
   # -> "PID"
   data <- subset(data, select=-c(Order, PID))
   # data <- subset(data, select=-c(Id))
-  
+
   # PRELIMINARY FEATURE ENGINEERING
   # -> Scale down the year built to start at 0.
   # -> Transform Year.Remod.Add <- Year.Remod.Add - Year.Built.
@@ -121,7 +128,7 @@ preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
   data$Year.Remod.Add <- data$Year.Remod.Add - data$Year.Built
   data$Garage.Yr.Blt <- data$Garage.Yr.Blt - data$Year.Built
   data$Year.Built <- data$Year.Built - min(data$Year.Built, na.rm=TRUE)
-  
+
   ## MISSING VALUES
   # Take out any covariates that are missing a lot of values, as it is not
   # feasible to use them for analysis.
@@ -133,7 +140,7 @@ preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
     }
   }
   data <- data[, !(names(data) %in% to_drop_1)]
-  
+
   # Get list of numerical and categorical covariates
   cat_var <- c()
   num_var <- c()
@@ -145,7 +152,7 @@ preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
       num_var <- append(num_var, name)
     }
   }
-  
+
   # Handle the remaining NAs
   if (remove.nas) {
     data <- na.omit(data)
@@ -161,8 +168,8 @@ preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
             # 2/3 chance that we will use nearest neighbors for categorical
             # covariates. 1/3 chance that we take the mode. This is to save
             # time computationally, as nn_val takes a while...
-            data[idx,name] <- ifelse(rbinom(1, 1, 2/3), 
-                                     nn_val(data, idx, name, cat_var), 
+            data[idx,name] <- ifelse(rbinom(1, 1, 2/3),
+                                     nn_val(data, idx, name, cat_var),
                                      mode(na.omit(data[,name])))
           }
           else {
@@ -172,62 +179,80 @@ preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
       }
     }
   }
-  
+
   ## DIMENSIONALITY REDUCTION
-  
+
   # CATEGORICAL PROCESSING
   # Idea: Use the categorical covariates with the highest information gain.
-  ig <- attrEval(SalePrice~., data=subset(data, select=c(cat_var, "SalePrice")), 
+  ig <- attrEval(SalePrice~., data=subset(data, select=c(cat_var, "SalePrice")),
                  estimator='InfGain')
   ig <- sort(ig, decreasing=TRUE)
   low_ig_attrs <- names(ig[ig_cap+1:length(ig)])
   data <- data[, !(names(data) %in% low_ig_attrs)]
-  
+
   cat_var <- cat_var[!(cat_var %in% low_ig_attrs)]
+  
+  # Convert some categorical variables to ordinal
+  quality = c('Po' = 1, 'Fa' = 2, 'TA' = 3, 'Gd' = 4, 'Ex' = 5)
+  data$Bsmt.Qual<-as.integer(revalue(data$Bsmt.Qual, quality)) %>% replace(is.na(.), 0)
+  data$Kitchen.Qual<-as.integer(revalue(data$Kitchen.Qual, quality)) %>% replace(is.na(.), 0)
+  data$Fireplace.Qu<-as.integer(revalue(data$Fireplace.Qu, quality)) %>% replace(is.na(.), 0)
+  
+  finishType = c('Unf'=1, 'LwQ'=2, 'Rec'=3, 'BLQ'=4, 'ALQ'=5, 'GLQ'=6)
+  data$BsmtFin.Type.1<-as.integer(revalue(data$BsmtFin.Type.1, finishType)) %>% replace(is.na(.), 0)
+  
+  garageFinishType <- c('Unf'=1, 'RFn'=2, 'Fin'=3)
+  data$Garage.Finish<-as.integer(revalue(data$Garage.Finish, garageFinishType)) %>% replace(is.na(.), 0)
+  
+  # Remove newly created ordinal variables from cat_var
+  remove = c("Bsmt.Qual", "Kitchen.Qual", "Fireplace.Qu", "BsmtFin.Type.1", "Garage.Finish")
+  cat_var = cat_var[!cat_var %in% remove]
+  
+  # Convert the remaining categorical variables into non-ordered numeric factors.
   for (name in cat_var) {
     data[,name] <- as.numeric(as.factor(data[,name]))
   }
-  
+
   # NUMERIC COLUMNS PROCESSING
   # Extract numerical columns from the dataset
   num_cols <- data[ , num_var]
-  
+
   # Compute the correlation matrix
   cor_matrix <- cor(num_cols, method='pearson', use='pairwise.complete.obs')
   diag(cor_matrix) <- 0
-  
+
   cor_threshold <- 0.8
-  
+
   # Create a vector to keep track of the selected features
   features_to_remove <- character(0)
-  
+
   #  one representative from each group of highly correlated features
   for (i in 1:(ncol(cor_matrix) - 1)) {
     if (!(colnames(cor_matrix)[i] %in% features_to_remove)) {
-      highly_correlated <- colnames(cor_matrix)[cor_matrix[, i] >= 
+      highly_correlated <- colnames(cor_matrix)[cor_matrix[, i] >=
                                                   cor_threshold]
       features_to_remove <- c(features_to_remove, highly_correlated[1])
     }
   }
   to_drop_2 <- features_to_remove[!is.na(features_to_remove)]
-  
+
   cat("Columns dropped:", paste(to_drop_2, collapse = ", "), "\n")
   data <- data[, !(names(data) %in% to_drop_2)]
-  
+
   # Calculate correlation between each column and the target
-  correlations <- cor(num_cols[, -which(names(num_cols) == "SalePrice")], 
+  correlations <- cor(num_cols[, -which(names(num_cols) == "SalePrice")],
                       num_cols$SalePrice)
-  
+
   # Find covariates with correlation below 0.4
   below_indices <- which(abs(correlations) < 0.4, arr.ind = TRUE)
 
   to_drop_3 <- rownames(correlations)[below_indices[, 1]]
-  
+
   cat("Columns dropped:", paste(to_drop_3, collapse = ", "), "\n")
   data <- data[, !(names(data) %in% to_drop_3)]
-  
+
   data$SalePrice <- log(data$SalePrice)
-  
+
   # The artifacts to return
   return_list <- list(
     data=data,
@@ -236,7 +261,7 @@ preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
     too_low_relation=to_drop_3,
     cat_var=cat_var
   )
-  
+
   return(return_list)
 }
 
@@ -255,24 +280,23 @@ preprocess <- function(data, remove.nas=TRUE, ig_cap=10) {
 # -> best_model: The best model resulting from k-fold cross-validation.
 # -> metric: Value of performance metric used on best_model and the test set.
 
-# Imports
-library(ICglm)
-library(splines)
-library(gam)
-library(glmnet)
-
 get_s <- function(data, attr) {
   return(s(data[,attr], k=length(unique(data[,attr]))))
 }
 
+data <- read.csv('house-prices-advanced-regression-techniques/AmesHousing.csv')
 data <- preprocess(data, remove.na=FALSE)$data
 
 test_idx <- sample(1:nrow(data), round(nrow(data)*0.2))
 test_set <- data[test_idx, ]
 train_set <- data[-test_idx, ]
 
+# Export train and test set for later use
+# write.csv(test_set, "test_set.csv", row.names=FALSE)
+# write.csv(train_set, "train_set.csv", row.names=FALSE)
+
 cross_val <- function(test_set, data, k, linear_model=TRUE) {
-  
+
   loss.mlr <- 0
   loss.gam <- 0
   loss.lasso <- 0
@@ -285,110 +309,110 @@ cross_val <- function(test_set, data, k, linear_model=TRUE) {
     val_end <- min(val_start + fold_len - 1, nrow(data))
     val_fold <- data[val_start:val_end,]
     train_folds <- data[-(val_start:val_end),]
-    
+
     # Naive MLR Model
     model.mlr <- lm(SalePrice~., data=train_folds)
     pred.mlr <- predict(model.mlr, newdata=val_fold)
     loss.mlr <- loss.mlr + sum((pred.mlr-val_fold$SalePrice)**2)
-    
+
     # GAM Model
     formula <- SalePrice ~
-      s(Neighborhood) +
-      s(House.Style) +
-      s(Overall.Qual) +
+      s(Neighborhood, k=length(unique(train_folds$Neighborhood))) +
+      s(House.Style, k=length(unique(train_folds$House.Style))) +
+      s(Overall.Qual, k=length(unique(train_folds$Overall.Qual))) +
       s(Year.Built) +
-      s(Exterior.1st) +
-      s(Exterior.2nd) +
+      s(Exterior.1st, k=length(unique(train_folds$Exterior.1st))) +
+      s(Exterior.2nd, k=length(unique(train_folds$Exterior.2nd))-1) +
       s(Mas.Vnr.Area) +
-      s(Foundation) +
-      s(Bsmt.Qual) +
-      s(BsmtFin.Type.1) +
+      s(Foundation, k=length(unique(train_folds$Foundation))) +
+      s(Bsmt.Qual, k=length(unique(train_folds$Bsmt.Qual))) +
+      s(BsmtFin.Type.1, k=length(unique(train_folds$BsmtFin.Type.1))) +
       s(BsmtFin.SF.1) +
       s(Total.Bsmt.SF) +
       s(Gr.Liv.Area) +
-      s(Full.Bath) +
-      s(Kitchen.Qual) +
-      s(Fireplaces) +
-      s(Fireplace.Qu) +
-      s(Garage.Finish) +
-      s(Garage.Cars)
-    
-    model.gam = gam(formula, data=data)
+      s(Full.Bath, k=length(unique(train_folds$Full.Bath))) +
+      s(Kitchen.Qual, k=length(unique(train_folds$Kitchen.Qual))) +
+      s(Fireplaces, k=length(unique(train_folds$Fireplaces))) +
+      s(Fireplace.Qu, k=length(unique(train_folds$Fireplace.Qu))) +
+      s(Garage.Finish, k=length(unique(train_folds$Garage.Finish))) +
+      s(Garage.Cars, k=length(unique(train_folds$Garage.Cars)))
+
+    model.gam = gam(formula, data=train_folds)
     pred.gam <- predict(model.gam, newdata=val_fold)
-    loss.gam <- loss.gam + sum((pred.gam-val_fold$SalePrice)**2)
-    
+    loss.gam <- loss.gam + sum((pred.gam-val_fold$SalePrice)^2)
+
     # Structure data for linear regression models
     X <- as.matrix(train_folds, ncol=20)[,-20]
     Y <- as.matrix(train_folds, ncol=20)[,20]
-    
+
     testX = as.matrix(val_fold, ncol=20)[,-20]
     testY = as.matrix(val_fold, ncol=20)[,20]
-    
+
     # Lasso Model
     model.lasso <- cv.glmnet(X, Y, type.measure = "mse", alpha=1)
     pred.lasso = predict(model.lasso, newx = testX, type = "response")
     loss.lasso = loss.lasso + sum((testY - pred.lasso)^2)
-    
+
     # Ridge Model
     model.ridge <- cv.glmnet(X, Y, type.measure = "mse", alpha=0)
     pred.ridge = predict(model.ridge, newx = testX, type = "response")
     loss.ridge = loss.ridge + sum((testY - pred.ridge)^2)
   }
 
-  loss.mlr <- loss.mlr / nrow(data)
-  loss.gam = loss.gam / nrow(data)
-  loss.lasso = loss.lasso / nrow(data)
-  loss.ridge = loss.ridge / nrow(data)
+  loss.mlr = sqrt(loss.mlr / nrow(data))
+  loss.gam = sqrt(loss.gam / nrow(data))
+  loss.lasso = sqrt(loss.lasso / nrow(data))
+  loss.ridge = sqrt(loss.ridge / nrow(data))
 
   # Calculate final test errors for the models
   mlr_model <- lm(SalePrice~., data=data)
   pred.mlr <- predict(model.mlr, newdata=test_set)
-  testerr.mlr <- mean((pred.mlr-test_set$SalePrice)^2)
-  
+  testerr.mlr <- sqrt(mean((pred.mlr-test_set$SalePrice)^2))
+
   formula <- SalePrice ~
-    s(Neighborhood) +
-    s(House.Style) +
-    s(Overall.Qual) +
-    s(Year.Built) +
-    s(Exterior.1st) +
-    s(Exterior.2nd) +
-    s(Mas.Vnr.Area) +
-    s(Foundation) +
-    s(Bsmt.Qual) +
-    s(BsmtFin.Type.1) +
-    s(BsmtFin.SF.1) +
-    s(Total.Bsmt.SF) +
-    s(Gr.Liv.Area) +
-    s(Full.Bath) +
-    s(Kitchen.Qual) +
-    s(Fireplaces) +
-    s(Fireplace.Qu) +
-    s(Garage.Finish) +
-    s(Garage.Cars)
-  
+  s(Neighborhood, k=length(unique(train_set$Neighborhood))) +
+  s(House.Style, k=length(unique(train_set$House.Style))) +
+  s(Overall.Qual, k=length(unique(train_set$Overall.Qual))) +
+  s(Year.Built) +
+  s(Exterior.1st, k=length(unique(train_set$Exterior.1st))) +
+  s(Exterior.2nd, k=length(unique(train_set$Exterior.2nd))) +
+  s(Mas.Vnr.Area) +
+  s(Foundation, k=length(unique(train_set$Foundation))) +
+  s(Bsmt.Qual, k=length(unique(train_set$Bsmt.Qual))) +
+  s(BsmtFin.Type.1, k=length(unique(train_set$BsmtFin.Type.1))) +
+  s(BsmtFin.SF.1) +
+  s(Total.Bsmt.SF) +
+  s(Gr.Liv.Area) +
+  s(Full.Bath, k=length(unique(train_set$Full.Bath))) +
+  s(Kitchen.Qual, k=length(unique(train_set$Kitchen.Qual))) +
+  s(Fireplaces, k=length(unique(train_set$Fireplaces))) +
+  s(Fireplace.Qu, k=length(unique(train_set$Fireplace.Qu))) +
+  s(Garage.Finish, k=length(unique(train_set$Garage.Finish))) +
+  s(Garage.Cars, k=length(unique(train_set$Garage.Cars)))
+
   gam_model = gam(formula, data=data)
-  
+
   # Create matrices for linear regression functions
   X <- as.matrix(data, ncol=20)[,-20]
   Y <- as.matrix(data, ncol=20)[,20]
-  
+
   testX = as.matrix(test_set, ncol=20)[,-20]
   testY = as.matrix(test_set, ncol=20)[,20]
-  
+
   # Final Lasso Model
   model.lasso <- cv.glmnet(X, Y, type.measure = "mse", alpha=1)
   pred.lasso = predict(model.lasso, newx = testX, type = "response")
-  testerr.lasso = mean((pred.lasso - testY)^2)
-  
+  testerr.lasso = sqrt(mean(((pred.lasso - testY)^2)))
+
   # Ridge Model
   model.ridge <- cv.glmnet(X, Y, type.measure = "mse", alpha=0)
   pred.ridge = predict(model.ridge, newx = testX, type = "response")
-  testerr.ridge = mean((pred.ridge - testY)^2)
-  
+  testerr.ridge = sqrt(mean(((pred.ridge - testY)^2)))
+
   # Compute predictions of model on test set
   pred <- predict(gam_model, test_set, type="response")
-  testerr.gam <- mean((pred-test_set$SalePrice)**2)
-  
+  testerr.gam <- sqrt(mean((pred-test_set$SalePrice)^2))
+
   return(list(
     loss.mlr = loss.mlr,
     loss.gam = loss.gam,
@@ -401,35 +425,46 @@ cross_val <- function(test_set, data, k, linear_model=TRUE) {
   ))
 }
 
-cross_val(test_set, train_set, k=20)
+cv_rsme_scores = cross_val(test_set, train_set, k=30)
+cv_rsme_scores
 
 ################################################################################
 
 # Plot the GAM smooths
 formula <- SalePrice ~
-  s(Neighborhood) +
-  s(House.Style) +
-  s(Overall.Qual) +
+  s(Neighborhood, k=length(unique(train_set$Neighborhood))) +
+  s(House.Style, k=length(unique(train_set$House.Style))) +
+  s(Overall.Qual, k=length(unique(train_set$Overall.Qual))) +
   s(Year.Built) +
-  s(Exterior.1st) +
-  s(Exterior.2nd) +
+  s(Exterior.1st, k=length(unique(train_set$Exterior.1st))) +
+  s(Exterior.2nd, k=length(unique(train_set$Exterior.2nd))) +
   s(Mas.Vnr.Area) +
-  s(Foundation) +
-  s(Bsmt.Qual) +
-  s(BsmtFin.Type.1) +
+  s(Foundation, k=length(unique(train_set$Foundation))) +
+  s(Bsmt.Qual, k=length(unique(train_set$Bsmt.Qual))) +
+  s(BsmtFin.Type.1, k=length(unique(train_set$BsmtFin.Type.1))) +
   s(BsmtFin.SF.1) +
   s(Total.Bsmt.SF) +
   s(Gr.Liv.Area) +
-  s(Full.Bath) +
-  s(Kitchen.Qual) +
-  s(Fireplaces) +
-  s(Fireplace.Qu) +
-  s(Garage.Finish) +
-  s(Garage.Cars)
+  s(Full.Bath, k=length(unique(train_set$Full.Bath))) +
+  s(Kitchen.Qual, k=length(unique(train_set$Kitchen.Qual))) +
+  s(Fireplaces, k=length(unique(train_set$Fireplaces))) +
+  s(Fireplace.Qu, k=length(unique(train_set$Fireplace.Qu))) +
+  s(Garage.Finish, k=length(unique(train_set$Garage.Finish))) +
+  s(Garage.Cars, k=length(unique(train_set$Garage.Cars)))
 
 gam_model = gam(formula, data=train_set)
-preds = predict(gam_model, newdata=test_set)
-mean(sqrt((exp(preds) - exp(test_set$SalePrice))^2))
 
-par(mfrow=c(3, 7))
-plot(gam_model, residuals=TRUE, col='grey')
+preds = predict(gam_model, newdata=test_set, type="response")
+# MAE transformed
+mean(abs((exp(preds) - exp(test_set$SalePrice))))
+# RMSE tranformed
+sqrt(mean((exp(preds) - exp(test_set$SalePrice))^2))
+# MSE
+sqrt(mean((preds - test_set$SalePrice)^2))
+
+par(mfrow=c(5, 4))
+plot(gam_model, residuals=TRUE, scheme=1, pch=1, trans=exp, shift=mean(train_set$SalePrice), cex=0.75)
+
+# Check assumptions of GAM
+par(mfrow=c(2, 2))
+gam.check(gam_model)
